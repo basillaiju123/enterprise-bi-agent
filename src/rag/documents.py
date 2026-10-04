@@ -1,5 +1,6 @@
 from src.schema_catalog import SCHEMA_CATALOG
 from src.business_catalog import BUSINESS_CATALOG
+from src.rag.sql_examples import SQL_EXAMPLES
 
 
 BUSINESS_SYNONYMS = {
@@ -82,9 +83,7 @@ This table may be relevant to questions about:
     # Business definition documents
     for item in BUSINESS_CATALOG:
         term = item["term"]
-
         synonyms = BUSINESS_SYNONYMS.get(term, [])
-
         synonym_text = ", ".join(synonyms)
 
         text = f"""Business metric definition.
@@ -107,6 +106,29 @@ Related business concepts:
                 "id": f"business_{term.lower().replace(' ', '_')}",
                 "type": "business",
                 "source": term,
+                "text": text,
+            }
+        )
+
+    # SQL example documents
+    for example in SQL_EXAMPLES:
+        text = f"""SQL query example.
+
+User Question:
+{example["question"]}
+
+SQL:
+{example["sql"]}
+
+Description:
+{example["description"]}
+"""
+
+        documents.append(
+            {
+                "id": example["id"],
+                "type": "sql_example",
+                "source": example["question"],
                 "text": text,
             }
         )
