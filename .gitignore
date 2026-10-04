@@ -5,3 +5,5 @@ __pycache__/
 .venv/
 
 data/qdrant/
+
+data/hitl_checkpoints.sqlite

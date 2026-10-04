@@ -13,3 +13,5 @@ class AgentState(TypedDict):
     retry_count: int
     expected_result: list
     evaluation_mode: bool
+    approval_required: bool
+    approval_status: str

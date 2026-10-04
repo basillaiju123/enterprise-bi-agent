@@ -10,9 +10,15 @@ DB_PATH = "data/sample_warehouse.duckdb"
 
 @observe(name="execute_sql")
 def execute_sql_node(state: AgentState) -> AgentState:
-
     sql = state["generated_sql"]
     role = state["user_role"]
+
+    if state.get("approval_status", "") == "rejected":
+        return {
+            **state,
+            "query_result": [],
+            "execution_error": "SQL execution rejected by human.",
+        }
 
     if state["validation_error"]:
         return {
