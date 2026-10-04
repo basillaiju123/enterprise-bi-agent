@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from src.graph import graph
+from src.security.rbac import validate_role
 
 
 app = FastAPI(
@@ -13,6 +14,7 @@ app = FastAPI(
 
 class QueryRequest(BaseModel):
     question: str
+    role: str = "analyst"
 
 
 class QueryResponse(BaseModel):
@@ -40,9 +42,16 @@ def query_database(request: QueryRequest):
             detail="Question cannot be empty.",
         )
 
+    if not validate_role(request.role):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid role: {request.role}",
+        )
+
     try:
         initial_state = {
             "user_question": request.question,
+            "user_role": request.role,
             "schema_context": "",
             "generated_sql": "",
             "validation_error": "",
@@ -56,9 +65,10 @@ def query_database(request: QueryRequest):
         result = graph.invoke(initial_state)
 
         error = (
-            result["execution_error"]
-            or result["validation_error"]
-        )
+    		result.get("authorization_error", "")
+    		or result["execution_error"]
+    		or result["validation_error"]
+	)
 
         return {
             "question": request.question,

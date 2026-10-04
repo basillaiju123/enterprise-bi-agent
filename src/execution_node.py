@@ -3,6 +3,7 @@ from langfuse import observe
 
 from src.graph_state import AgentState
 from src.guardrails.validator import validate_sql
+from src.security.sql_authorizer import authorize_sql
 
 DB_PATH = "data/sample_warehouse.duckdb"
 
@@ -11,6 +12,7 @@ DB_PATH = "data/sample_warehouse.duckdb"
 def execute_sql_node(state: AgentState) -> AgentState:
 
     sql = state["generated_sql"]
+    role = state["user_role"]
 
     if state["validation_error"]:
         return {
@@ -25,6 +27,15 @@ def execute_sql_node(state: AgentState) -> AgentState:
             **state,
             "validation_error": message,
             "execution_error": "SQL validation failed.",
+        }
+
+    is_authorized, authorization_message = authorize_sql(sql, role)
+
+    if not is_authorized:
+        return {
+            **state,
+            "authorization_error": authorization_message,
+            "execution_error": "",
         }
 
     con = duckdb.connect(DB_PATH)
