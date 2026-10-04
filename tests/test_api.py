@@ -23,7 +23,18 @@ def test_empty_question():
     assert response.json()["detail"] == "Question cannot be empty."
 
 
-def test_valid_query():
+def test_valid_query(monkeypatch):
+    def fake_invoke(state):
+        return {
+            "generated_sql": "SELECT COUNT(*) FROM customers WHERE country = 'India';",
+            "query_result": [(2,)],
+            "execution_error": "",
+            "validation_error": "",
+            "retry_count": 0,
+        }
+
+    monkeypatch.setattr("src.api.graph.invoke", fake_invoke)
+
     response = client.post(
         "/query",
         json={
