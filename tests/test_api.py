@@ -31,6 +31,8 @@ def test_valid_query(monkeypatch):
             "execution_error": "",
             "validation_error": "",
             "retry_count": 0,
+            "approval_required": False,
+            "approval_status": "",
         }
 
     monkeypatch.setattr("src.api.graph.invoke", fake_invoke)

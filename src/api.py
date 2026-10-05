@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from langgraph.types import Command
 
 from src.graph import graph
 from src.security.rbac import validate_role
@@ -13,6 +14,10 @@ app = FastAPI(
     version="1.0.0",
 )
 
+
+# ---------------------------------------------------------
+# Request / Response Models
+# ---------------------------------------------------------
 
 class QueryRequest(BaseModel):
     question: str
@@ -26,7 +31,18 @@ class QueryResponse(BaseModel):
     error: str
     retries: int
     cache_hit: bool
+    thread_id: str
+    approval_required: bool
+    approval_status: str
 
+
+class ApprovalRequest(BaseModel):
+    approved: bool
+
+
+# ---------------------------------------------------------
+# Root Endpoint
+# ---------------------------------------------------------
 
 @app.get("/")
 def root():
@@ -35,6 +51,10 @@ def root():
         "status": "running",
     }
 
+
+# ---------------------------------------------------------
+# Query Endpoint
+# ---------------------------------------------------------
 
 @app.post("/query", response_model=QueryResponse)
 def query_database(request: QueryRequest):
@@ -52,6 +72,11 @@ def query_database(request: QueryRequest):
         )
 
     try:
+
+        # -------------------------------------------------
+        # Initial Agent State
+        # -------------------------------------------------
+
         initial_state = {
             "user_question": request.question,
             "user_role": request.role,
@@ -70,17 +95,30 @@ def query_database(request: QueryRequest):
             "cache_key": "",
         }
 
-        # Each API request gets its own LangGraph thread.
+        # -------------------------------------------------
+        # Create persistent LangGraph thread
+        # -------------------------------------------------
+
+        thread_id = str(uuid4())
+
         config = {
             "configurable": {
-                "thread_id": str(uuid4()),
+                "thread_id": thread_id,
             }
         }
+
+        # -------------------------------------------------
+        # Run Agent
+        # -------------------------------------------------
 
         result = graph.invoke(
             initial_state,
             config,
         )
+
+        # -------------------------------------------------
+        # Error Handling
+        # -------------------------------------------------
 
         error = (
             result.get("authorization_error", "")
@@ -88,17 +126,106 @@ def query_database(request: QueryRequest):
             or result.get("validation_error", "")
         )
 
+        # -------------------------------------------------
+        # API Response
+        # -------------------------------------------------
+
         return {
             "question": request.question,
-            "sql": result["generated_sql"],
-            "result": result["query_result"],
+            "sql": result.get("generated_sql", ""),
+            "result": result.get("query_result", []),
             "error": error,
-            "retries": result["retry_count"],
+            "retries": result.get("retry_count", 0),
             "cache_hit": result.get("cache_hit", False),
+            "thread_id": thread_id,
+            "approval_required": result.get(
+                "approval_required",
+                False,
+            ),
+            "approval_status": result.get(
+                "approval_status",
+                "",
+            ),
         }
 
     except Exception as e:
+
         raise HTTPException(
             status_code=500,
             detail=f"Agent execution failed: {str(e)}",
+        )
+
+
+# ---------------------------------------------------------
+# Human Approval Endpoint
+# ---------------------------------------------------------
+
+@app.post("/approve")
+def approve_query(
+    thread_id: str,
+    request: ApprovalRequest,
+):
+
+    try:
+
+        result = graph.invoke(
+            Command(
+                resume=request.approved
+            ),
+            {
+                "configurable": {
+                    "thread_id": thread_id,
+                }
+            },
+        )
+
+        # -------------------------------------------------
+        # Error Handling
+        # -------------------------------------------------
+
+        error = (
+            result.get("authorization_error", "")
+            or result.get("execution_error", "")
+            or result.get("validation_error", "")
+        )
+
+        # -------------------------------------------------
+        # Approval Response
+        # -------------------------------------------------
+
+        return {
+            "thread_id": thread_id,
+            "sql": result.get(
+                "generated_sql",
+                "",
+            ),
+            "result": result.get(
+                "query_result",
+                [],
+            ),
+            "error": error,
+            "approval_status": result.get(
+                "approval_status",
+                "",
+            ),
+            "approval_required": (
+            False
+            if result.get("approval_status") == "approved"
+            else result.get("approval_required", False)
+            ),
+            "retries": result.get(
+                "retry_count",
+                0,
+            ),
+            "cache_hit": result.get(
+                "cache_hit",
+                False,
+            ),
+        }
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Approval failed: {str(e)}",
         )
