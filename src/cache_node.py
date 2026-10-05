@@ -3,21 +3,40 @@ from src.semantic_cache import get_cached_sql, make_cache_key
 
 
 def cache_lookup_node(state: AgentState) -> AgentState:
+
+    # Evaluation must bypass semantic cache
+    # so benchmark results measure the actual agent pipeline.
+    if state.get("evaluation_mode", False):
+        return {
+            **state,
+            "cache_hit": False,
+            "cache_key": "evaluation-bypass",
+        }
+
     question = state["user_question"]
     role = state["user_role"]
 
-    cached_sql = get_cached_sql(question, role)
+    cached_sql = get_cached_sql(
+        question,
+        role,
+    )
 
     if cached_sql is None:
         return {
             **state,
             "cache_hit": False,
-            "cache_key": make_cache_key(question, role),
+            "cache_key": make_cache_key(
+                question,
+                role,
+            ),
         }
 
     return {
         **state,
         "cache_hit": True,
-        "cache_key": make_cache_key(question, role),
+        "cache_key": make_cache_key(
+            question,
+            role,
+        ),
         "generated_sql": cached_sql,
     }
