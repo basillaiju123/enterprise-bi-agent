@@ -15,3 +15,5 @@ class AgentState(TypedDict):
     evaluation_mode: bool
     approval_required: bool
     approval_status: str
+    cache_hit: bool
+    cache_key: str

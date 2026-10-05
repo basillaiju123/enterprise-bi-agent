@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -23,6 +25,7 @@ class QueryResponse(BaseModel):
     result: list
     error: str
     retries: int
+    cache_hit: bool
 
 
 @app.get("/")
@@ -55,20 +58,35 @@ def query_database(request: QueryRequest):
             "schema_context": "",
             "generated_sql": "",
             "validation_error": "",
+            "authorization_error": "",
             "execution_error": "",
             "query_result": [],
             "retry_count": 0,
             "expected_result": [],
             "evaluation_mode": False,
+            "approval_required": False,
+            "approval_status": "",
+            "cache_hit": False,
+            "cache_key": "",
         }
 
-        result = graph.invoke(initial_state)
+        # Each API request gets its own LangGraph thread.
+        config = {
+            "configurable": {
+                "thread_id": str(uuid4()),
+            }
+        }
+
+        result = graph.invoke(
+            initial_state,
+            config,
+        )
 
         error = (
-    		result.get("authorization_error", "")
-    		or result["execution_error"]
-    		or result["validation_error"]
-	)
+            result.get("authorization_error", "")
+            or result.get("execution_error", "")
+            or result.get("validation_error", "")
+        )
 
         return {
             "question": request.question,
@@ -76,6 +94,7 @@ def query_database(request: QueryRequest):
             "result": result["query_result"],
             "error": error,
             "retries": result["retry_count"],
+            "cache_hit": result.get("cache_hit", False),
         }
 
     except Exception as e:

@@ -24,7 +24,7 @@ def test_empty_question():
 
 
 def test_valid_query(monkeypatch):
-    def fake_invoke(state):
+    def fake_invoke(state, config=None):
         return {
             "generated_sql": "SELECT COUNT(*) FROM customers WHERE country = 'India';",
             "query_result": [(2,)],

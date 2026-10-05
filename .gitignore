@@ -7,3 +7,8 @@ __pycache__/
 data/qdrant/
 
 data/hitl_checkpoints.sqlite
+data/semantic_cache.sqlite
+data/semantic_cache.sqlite
+data/hitl_checkpoints.sqlite
+data/hitl_checkpoints.sqlite-shm
+data/hitl_checkpoints.sqlite-wal
