@@ -17,3 +17,5 @@ class AgentState(TypedDict):
     approval_status: str
     cache_hit: bool
     cache_key: str
+    evaluation_replay: bool
+    replay_sql: str

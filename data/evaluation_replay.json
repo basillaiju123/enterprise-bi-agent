@@ -1,0 +1,92 @@
+{
+  "How many customers are from India?": {
+    "sql": "SELECT COUNT(*) FROM customers WHERE country = 'India';"
+  },
+  "Show the customer ID and customer name for customers from India.": {
+    "sql": "SELECT customer_id, customer_name\nFROM customers\nWHERE country = 'India';"
+  },
+  "Which products are in the Accessories category?": {
+    "sql": "SELECT product_id, product_name\nFROM products\nWHERE category = 'Accessories';"
+  },
+  "Show the product ID and product name for products costing more than 100.": {
+    "sql": "SELECT product_id, product_name\nFROM products\nWHERE price > 100;"
+  },
+  "How many customers are there?": {
+    "sql": "SELECT COUNT(*) FROM customers;"
+  },
+  "How many products are there?": {
+    "sql": "SELECT COUNT(*) FROM products;"
+  },
+  "How many orders are there?": {
+    "sql": "SELECT COUNT(*) \nFROM orders;"
+  },
+  "What is the total order quantity?": {
+    "sql": "SELECT SUM(quantity) AS total_order_quantity\nFROM order_items;"
+  },
+  "What is the total revenue?": {
+    "sql": "SELECT SUM(order_items.quantity * products.price) AS revenue\nFROM order_items\nJOIN products\n    ON order_items.product_id = products.product_id;"
+  },
+  "What is the most expensive product?": {
+    "sql": "SELECT product_name, price\nFROM products\nORDER BY price DESC\nLIMIT 1;"
+  },
+  "What is the cheapest product?": {
+    "sql": "SELECT product_name, price\nFROM products\nORDER BY price ASC\nLIMIT 1;"
+  },
+  "What are the three most expensive products?": {
+    "sql": "SELECT product_name, price\nFROM products\nORDER BY price DESC\nLIMIT 3;"
+  },
+  "What are the two cheapest products?": {
+    "sql": "SELECT product_name, price\nFROM products\nORDER BY price ASC\nLIMIT 2;"
+  },
+  "How many orders were completed by customers from India?": {
+    "sql": "SELECT COUNT(DISTINCT orders.order_id)\nFROM orders\nJOIN customers\n  ON orders.customer_id = customers.customer_id\nWHERE orders.status = 'Completed'\n  AND customers.country = 'India';"
+  },
+  "Show the product ID and product name for products that were ordered.": {
+    "sql": "SELECT DISTINCT p.product_id, p.product_name\nFROM products p\nJOIN order_items oi ON p.product_id = oi.product_id;"
+  },
+  "Show the product ID and total units ordered for each product.": {
+    "sql": "SELECT\n    product_id,\n    SUM(quantity) AS total_units_ordered\nFROM\n    order_items\nGROUP BY\n    product_id;"
+  },
+  "Show the customer ID and number of completed orders for each customer who placed a completed order.": {
+    "sql": "SELECT\n    customer_id,\n    COUNT(*) AS completed_order_count\nFROM orders\nWHERE status = 'Completed'\nGROUP BY customer_id;"
+  },
+  "What is the completed order count?": {
+    "sql": "SELECT COUNT(*) FROM orders WHERE status = 'Completed';"
+  },
+  "What is the cancelled order count?": {
+    "sql": "SELECT COUNT(*) AS cancelled_order_count\nFROM orders\nWHERE status = 'Cancelled';"
+  },
+  "What is the completed revenue?": {
+    "sql": "SELECT SUM(oi.quantity * p.price) AS revenue\nFROM order_items oi\nJOIN products p ON oi.product_id = p.product_id\nJOIN orders o ON oi.order_id = o.order_id\nWHERE o.status = 'Completed';"
+  },
+  "What is the cancelled revenue?": {
+    "sql": "SELECT SUM(order_items.quantity * products.price) AS cancelled_revenue\nFROM orders\nJOIN order_items ON orders.order_id = order_items.order_id\nJOIN products ON order_items.product_id = products.product_id\nWHERE orders.status = 'Cancelled';"
+  },
+  "What is the average order value for completed orders?": {
+    "sql": "SELECT\n    SUM(order_items.quantity * products.price) / COUNT(DISTINCT orders.order_id) AS avg_order_value\nFROM orders\nJOIN order_items\n    ON order_items.order_id = orders.order_id\nJOIN products\n    ON order_items.product_id = products.product_id\nWHERE orders.status = 'Completed';"
+  },
+  "Show the product ID, product name, and price for Electronics products costing more than 500.": {
+    "sql": "SELECT product_id, product_name, price\nFROM products\nWHERE category = 'Electronics'\n  AND price > 500;"
+  },
+  "Show the order ID and order date for completed orders placed in June 2025.": {
+    "sql": "SELECT order_id, order_date\nFROM orders\nWHERE status = 'Completed'\n  AND order_date >= '2025-06-01'\n  AND order_date <  '2025-07-01';"
+  },
+  "What are the names of customers from India who placed completed orders?": {
+    "sql": "SELECT DISTINCT customers.customer_name\nFROM customers\nJOIN orders ON orders.customer_id = customers.customer_id\nWHERE customers.country = 'India'\n  AND orders.status = 'Completed';"
+  },
+  "Which products are in the Furniture category?": {
+    "sql": "SELECT product_id, product_name\nFROM products\nWHERE category = 'Furniture';"
+  },
+  "Which customers are from Canada?": {
+    "sql": "SELECT customer_id, customer_name\nFROM customers\nWHERE country = 'Canada';"
+  },
+  "Which orders have Pending status?": {
+    "sql": "SELECT *\nFROM orders\nWHERE status = 'Pending';"
+  },
+  "Which orders were cancelled?": {
+    "sql": "SELECT *\nFROM orders\nWHERE status = 'Cancelled';"
+  },
+  "What are the names of customers who placed orders?": {
+    "sql": "SELECT DISTINCT c.customer_name\nFROM customers c\nJOIN orders o ON c.customer_id = o.customer_id;"
+  }
+}

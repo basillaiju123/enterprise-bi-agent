@@ -49,20 +49,7 @@ def execute_sql_node(state: AgentState) -> AgentState:
     try:
         result = con.execute(sql).fetchall()
 
-        if (
-            len(result) == 1
-            and len(result[0]) == 1
-            and result[0][0] == 0
-        ):
-            return {
-                **state,
-                "query_result": result,
-                "execution_error": (
-                    "Query executed successfully but returned 0. "
-                    "Check filtering conditions, exact values, "
-                    "capitalization, joins, and column names."
-                ),
-            }
+       
 
         return {
             **state,

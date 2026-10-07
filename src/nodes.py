@@ -14,6 +14,24 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 @observe(name="generate_sql")
 def generate_sql_node(state: AgentState) -> AgentState:
 
+    # ---------------------------------------------------------
+    # Evaluation replay mode
+    # ---------------------------------------------------------
+
+    if state.get("evaluation_replay", False):
+
+        replay_sql = state.get("replay_sql", "")
+
+        if replay_sql:
+            return {
+                **state,
+                "generated_sql": replay_sql,
+            }
+
+    # ---------------------------------------------------------
+    # Normal SQL generation
+    # ---------------------------------------------------------
+
     question = state["user_question"]
     retry_count = state["retry_count"]
 
