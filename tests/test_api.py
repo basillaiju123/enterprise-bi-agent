@@ -80,3 +80,7 @@ def test_zero_result_is_valid(monkeypatch):
 
     assert data["error"] == ""
     assert data["result"] == [[0]]
+def test_health():
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json()["status"] == "healthy"

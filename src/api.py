@@ -52,6 +52,12 @@ def root():
     }
 
 
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "service": "enterprise-bi-agent",
+    }
 # ---------------------------------------------------------
 # Query Endpoint
 # ---------------------------------------------------------
