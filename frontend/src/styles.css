@@ -264,3 +264,38 @@ body{background:#0d0d19}
  .hero-actions button{height:38px;font-size:9px}
  .hero-scrim{display:block}
 }
+
+
+/* Fill the browser viewport instead of leaving unused space below the hero */
+html,body,#root{width:100%;height:100%;min-height:100%;margin:0}
+body{overflow:hidden}
+.hero-shell{
+ width:calc(100% - 16px);
+ max-width:none;
+ height:calc(100dvh - 16px);
+ min-height:calc(100dvh - 16px);
+ aspect-ratio:auto;
+ margin:8px auto;
+ grid-template-columns:154px minmax(0,1fr);
+}
+.hero-main{height:100%;min-height:0}
+.hero-content{height:calc(100% - 43px);min-height:0;flex:1}
+.hero-banner{height:100%;min-height:0;flex:1}
+.hero-copy{min-height:0;padding-top:0}
+.hero-mascot{max-height:230px}
+.nexa-art-wrap{width:100%;height:100%;max-width:210px;max-height:190px;display:flex;align-items:center;justify-content:center;margin:auto;animation:nexa-float 4s ease-in-out infinite}
+.nexa-art{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 13px 18px #05040a88)}
+.nexa-art-small{max-width:76px;max-height:64px;animation:none}
+.nexa-art-small .nexa-art{filter:drop-shadow(0 4px 6px #05040a66)}
+@keyframes nexa-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@media(max-width:760px){
+ .hero-shell{width:calc(100% - 12px);height:calc(100dvh - 12px);min-height:calc(100dvh - 12px);margin:6px auto}
+ .hero-content{height:calc(100% - 38px)}
+ .nexa-art-wrap{max-width:155px;max-height:145px}
+}
+@media(max-width:520px){
+ .hero-shell{width:100%;height:100dvh;min-height:100dvh;margin:0}
+ .hero-content{height:calc(100% - 42px)}
+ .nexa-art-wrap{max-width:120px;max-height:118px}
+ .nexa-art-small{max-width:70px;max-height:58px}
+}
