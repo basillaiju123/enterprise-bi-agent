@@ -421,3 +421,49 @@ body{overflow:hidden}
  .hero-actions button{height:39px;font-size:9px}
  .hero-scrim{display:block}
 }
+
+
+/* Nexa live virtual robot — animated directly in CSS, no image files required */
+.nexa-art-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:100%;max-width:270px;max-height:250px;margin:auto;overflow:visible;animation:nexa-hover 3.8s ease-in-out infinite}
+.live-bot{position:relative;width:220px;height:220px;transform:scale(.94);filter:drop-shadow(0 15px 18px #09061188)}
+.bot-antenna{position:absolute;z-index:1;top:1px;left:50%;width:5px;height:26px;transform:translateX(-50%);border-radius:5px;background:linear-gradient(90deg,#69482d,#e7bd83,#704b2d)}
+.bot-antenna i{position:absolute;top:-5px;left:-4px;width:13px;height:13px;border-radius:50%;background:#b98cff;box-shadow:0 0 8px #b98cff,0 0 18px #9465ff;animation:nexa-signal 1.6s ease-in-out infinite}
+.bot-head{position:absolute;z-index:4;top:19px;left:50%;width:158px;height:84px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:13px;border:7px solid #805b3b;border-radius:42px;background:linear-gradient(145deg,#f5d5a0 0%,#b9824d 42%,#65452f 100%);box-shadow:inset 0 4px 5px #fff0c9,0 7px 12px #08060b88}
+.bot-head:before{content:"";position:absolute;inset:6px;border-radius:34px;background:linear-gradient(145deg,#24212b,#090d19 65%,#302333);box-shadow:inset 0 0 12px #000}
+.bot-eye{position:relative;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;border:4px solid #664a36;background:radial-gradient(circle at 34% 27%,#fff1c4 0 5%,#ffc56c 13%,#b56a2e 33%,#32251f 62%,#090b12 76%);box-shadow:0 0 12px #ffb45b,inset 0 0 8px #f8c47d;overflow:hidden}
+.bot-eye:after{content:"";position:absolute;inset:0;background:#17131c;transform:scaleY(0);transform-origin:top;animation:nexa-blink 5.4s infinite}
+.bot-eye i{width:7px;height:7px;position:absolute;top:9px;left:11px;border-radius:50%;background:#fff8d9;box-shadow:0 0 7px #fff2b8}
+.bot-neck{position:absolute;z-index:2;top:95px;left:50%;width:24px;height:25px;transform:translateX(-50%);border-radius:5px;background:linear-gradient(90deg,#59402e,#e1b47a,#68482f)}
+.bot-torso{position:absolute;z-index:3;top:112px;left:50%;width:112px;height:82px;transform:translateX(-50%);border:6px solid #795638;border-radius:16px 16px 13px 13px;background:linear-gradient(145deg,#ffe1aa,#c38b51 54%,#815638);box-shadow:inset 0 4px 6px #fff2d3,0 5px 9px #08060b77;animation:nexa-breathe 3.8s ease-in-out infinite}
+.bot-screen{position:absolute;inset:12px 17px 14px;border:3px solid #9b744b;border-radius:7px;background:linear-gradient(145deg,#f7e5bd,#c9a16c);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#4f944d;box-shadow:inset 0 2px 5px #fff7dc}
+.bot-screen span{font-size:27px;line-height:25px;text-shadow:0 0 8px #7abf72}
+.bot-screen small{font-size:7px;font-weight:800;letter-spacing:2px;color:#75563a}
+.bot-chest-light{position:absolute;bottom:5px;left:50%;width:5px;height:5px;transform:translateX(-50%);border-radius:50%;background:#8dffc5;box-shadow:0 0 8px #8dffc5;animation:nexa-signal 1.3s infinite}
+.bot-arm{position:absolute;z-index:2;top:122px;width:19px;height:54px;border:4px solid #795537;border-radius:12px;background:linear-gradient(90deg,#815b3c,#e7bd83,#8d613b);transform-origin:top center}
+.bot-arm:before{content:"";position:absolute;bottom:-8px;left:-5px;width:25px;height:17px;border:3px solid #795537;border-radius:8px;background:linear-gradient(145deg,#f0cc91,#9d7047)}
+.bot-arm i{position:absolute;top:7px;left:4px;width:4px;height:24px;border-radius:4px;background:#f7d69d88}
+.bot-arm-left{left:39px;transform:rotate(19deg);animation:nexa-wave-left 2.8s ease-in-out infinite}
+.bot-arm-right{right:39px;transform:rotate(-19deg);animation:nexa-wave-right 3.4s ease-in-out infinite}
+.bot-track{position:absolute;z-index:4;top:174px;width:67px;height:39px;border:6px solid #4c4037;border-radius:13px;background:linear-gradient(180deg,#a28b70,#51463e);display:flex;align-items:center;justify-content:space-evenly;box-shadow:inset 0 0 0 2px #c5a77e,0 5px 8px #05040a77}
+.bot-track i{width:7px;height:23px;border-radius:4px;background:linear-gradient(90deg,#554b43,#c0a17a,#554b43);border:1px solid #6d5d4d}
+.bot-track-left{left:12px;transform:rotate(-5deg)}
+.bot-track-right{right:12px;transform:rotate(5deg)}
+.bot-shadow{position:absolute;bottom:-7px;left:50%;width:155px;height:17px;transform:translateX(-50%);border-radius:50%;background:#a46aff55;filter:blur(10px);animation:nexa-shadow 3.8s ease-in-out infinite}
+.nexa-art-small{width:54px;height:50px;max-width:54px;max-height:50px;flex:0 0 54px;animation:none;overflow:visible}
+.nexa-art-small .live-bot{transform:scale(.235);transform-origin:center center;flex:none}
+.hero-brand-mark{display:grid;place-items:center;overflow:visible}
+.hero-mascot>.nexa-art-wrap{max-width:270px;max-height:250px}
+.nexa-mood-think .bot-head{animation:nexa-think 1.5s ease-in-out infinite}
+.nexa-mood-think .bot-antenna i{background:#76dfff;box-shadow:0 0 12px #76dfff}
+.nexa-mood-think .bot-screen span{animation:nexa-spark 1s ease-in-out infinite}
+@keyframes nexa-hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes nexa-breathe{0%,100%{transform:translateX(-50%) scaleY(1)}50%{transform:translateX(-50%) scaleY(1.025)}}
+@keyframes nexa-blink{0%,43%,47%,100%{transform:scaleY(0)}45%{transform:scaleY(1)}}
+@keyframes nexa-signal{0%,100%{opacity:.65;filter:brightness(1)}50%{opacity:1;filter:brightness(1.8)}}
+@keyframes nexa-wave-left{0%,100%{transform:rotate(19deg)}50%{transform:rotate(34deg)}}
+@keyframes nexa-wave-right{0%,100%{transform:rotate(-19deg)}50%{transform:rotate(-9deg)}}
+@keyframes nexa-shadow{0%,100%{opacity:.55;transform:translateX(-50%) scaleX(1)}50%{opacity:.28;transform:translateX(-50%) scaleX(.78)}}
+@keyframes nexa-think{0%,100%{transform:translateX(-50%) rotate(0)}50%{transform:translateX(-50%) rotate(4deg)}}
+@keyframes nexa-spark{0%,100%{opacity:.6;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+@media(max-width:760px){.nexa-art-wrap{max-width:155px;max-height:145px}.live-bot{transform:scale(.67)}.nexa-art-small .live-bot{transform:scale(.22)}}
+@media(prefers-reduced-motion:reduce){.nexa-art-wrap,.live-bot,.bot-head,.bot-torso,.bot-eye:after,.bot-antenna i,.bot-arm,.bot-shadow,.bot-screen span{animation:none!important}}
