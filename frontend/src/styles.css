@@ -570,3 +570,43 @@ body{overflow:hidden}
 @media(max-width:760px){
  .hero-shell{width:100%;height:100dvh;min-height:100dvh;margin:0;border:0;border-radius:0}
 }
+
+
+/* Full-bleed atmospheric purple hero background — smooth gradients and soft light flow */
+.hero-main{display:flex;flex-direction:column;min-width:0;min-height:0;height:100dvh;background:#100d20}
+.hero-content{flex:1;min-height:0;height:auto;padding:0!important;display:flex;flex-direction:column}
+.hero-banner{
+ position:relative;isolation:isolate;flex:1;width:100%;height:100%;min-height:0;
+ margin:0;padding:0 28px 22px;overflow:hidden;border-radius:0;
+ background:
+  radial-gradient(ellipse at 29% 49%,rgba(135,65,224,.54) 0%,rgba(93,42,159,.32) 25%,transparent 54%),
+  radial-gradient(ellipse at 78% 15%,rgba(95,49,166,.25) 0%,transparent 42%),
+  radial-gradient(ellipse at 65% 95%,rgba(75,39,135,.25) 0%,transparent 48%),
+  linear-gradient(112deg,#19112d 0%,#281541 24%,#38205b 48%,#24153e 72%,#111126 100%);
+ background-size:cover;
+}
+.hero-banner:before{
+ content:"";position:absolute;inset:-12%;z-index:-1;pointer-events:none;
+ background:
+  radial-gradient(ellipse 42% 48% at 27% 47%,rgba(157,91,255,.34),transparent 72%),
+  radial-gradient(ellipse 34% 34% at 73% 23%,rgba(114,75,211,.22),transparent 75%),
+  radial-gradient(ellipse 44% 27% at 55% 100%,rgba(107,58,185,.22),transparent 76%);
+ filter:blur(30px);opacity:.95;
+}
+.hero-banner:after{
+ content:"";position:absolute;z-index:-1;inset:-18% -8%;pointer-events:none;
+ background:
+  radial-gradient(ellipse 58% 25% at 2% 54%,transparent 63%,rgba(183,119,255,.17) 65%,rgba(145,82,255,.10) 67%,transparent 72%),
+  radial-gradient(ellipse 65% 30% at 98% 62%,transparent 64%,rgba(181,119,255,.14) 66%,rgba(145,82,255,.08) 68%,transparent 73%);
+ filter:blur(17px);opacity:.85;
+}
+.hero-copy,.hero-search,.hero-actions{position:relative;z-index:1}
+.hero-copy{flex:0 0 auto}
+.hero-search{flex:0 0 auto}
+.hero-actions{flex:0 0 auto}
+.hero-wave{display:block;z-index:0;height:190px;border:0;opacity:.35;filter:blur(12px);pointer-events:none}
+.wave-one{bottom:4px;transform:rotate(-5deg);border-top:18px solid #9857ed22}
+.wave-two{bottom:25px;transform:rotate(5deg);border-top:14px solid #b47aff18;opacity:.25}
+@media(max-width:760px){
+ .hero-banner{padding:0 8px 14px}
+}
