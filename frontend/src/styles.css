@@ -709,3 +709,59 @@ body{overflow:hidden}
 @media(max-width:520px){
  .hero-banner{width:96%!important;height:88%!important;min-height:0!important;margin:auto!important;border-radius:16px!important}
 }
+
+
+/* Full-bleed gradient canvas: fill the entire workspace, not an inset card */
+.hero-content{
+ flex:1 1 auto!important;
+ width:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ height:100%!important;
+ padding:0!important;
+ margin:0!important;
+ overflow:hidden;
+ display:flex;
+}
+.hero-banner{
+ box-sizing:border-box!important;
+ position:relative;
+ isolation:isolate;
+ flex:1 1 auto!important;
+ width:100%!important;
+ max-width:none!important;
+ height:100%!important;
+ min-height:0!important;
+ margin:0!important;
+ border-radius:0!important;
+ overflow:hidden;
+ padding:0 28px 22px;
+ background:
+  radial-gradient(ellipse 58% 78% at 22% 55%,rgba(149,77,238,.48) 0%,rgba(110,55,190,.26) 42%,transparent 76%),
+  radial-gradient(ellipse 50% 62% at 78% 25%,rgba(104,91,225,.30) 0%,transparent 74%),
+  radial-gradient(ellipse 65% 55% at 52% 105%,rgba(138,75,220,.30),transparent 75%),
+  linear-gradient(120deg,#211431 0%,#382052 37%,#2c1c4d 68%,#17142f 100%)!important;
+ box-shadow:none!important;
+}
+.hero-banner:before{
+ content:"";position:absolute;z-index:0;inset:-10%;pointer-events:none;
+ background:
+  radial-gradient(ellipse 45% 48% at 24% 54%,rgba(193,125,255,.40),transparent 72%),
+  radial-gradient(ellipse 42% 38% at 78% 68%,rgba(95,128,255,.25),transparent 73%),
+  radial-gradient(ellipse 48% 30% at 57% 8%,rgba(175,111,255,.23),transparent 76%);
+ filter:blur(28px);opacity:1;
+}
+.hero-banner:after{
+ content:"";position:absolute;z-index:0;pointer-events:none;
+ left:-12%;bottom:-38%;width:124%;height:78%;
+ border-radius:50%;
+ transform:rotate(-7deg);
+ border-top:3px solid rgba(194,139,255,.48);
+ background:linear-gradient(180deg,rgba(154,100,255,.20),rgba(90,102,220,.10) 38%,transparent 76%);
+ box-shadow:0 -12px 32px rgba(177,111,255,.24),0 -30px 65px rgba(113,111,255,.15);
+ filter:blur(1.5px);
+}
+.hero-copy,.hero-search,.hero-actions{position:relative;z-index:2}
+@media(max-width:760px){
+ .hero-banner{padding:0 8px 14px}
+}
