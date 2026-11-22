@@ -322,3 +322,102 @@ body{overflow:hidden}
 .nexa-art-small{max-width:68px;max-height:60px;animation:none}.nexa-art-small .walle-bot{transform:scale(.32);transform-origin:center;width:210px;height:190px;flex:none}
 .hero-brand-mark.walle-logo{flex:none}
 @keyframes nexa-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* Reference-matched hero: larger sidebar, realistic robot, luminous purple stage */
+.hero-shell{grid-template-columns:clamp(210px,18vw,285px) minmax(0,1fr);width:calc(100% - 24px);height:calc(100dvh - 24px);min-height:560px;margin:12px auto;border-radius:24px}
+.hero-sidebar{padding:28px 22px 22px}
+.hero-brand{gap:13px;padding:0 8px 38px}
+.hero-brand-mark{width:68px;height:68px;border-radius:15px;background:transparent;box-shadow:none;overflow:visible}
+.hero-brand-mark img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 9px #0009)}
+.hero-brand b{font-size:clamp(18px,1.5vw,27px);letter-spacing:-.7px}
+.hero-sidebar nav{gap:10px}
+.hero-sidebar nav button{height:48px;border-radius:10px;padding:0 15px;gap:13px;font-size:clamp(12px,.9vw,16px)}
+.hero-sidebar nav button svg{width:19px;height:19px}
+.hero-profile{padding:20px 9px 8px;gap:13px;font-size:14px}
+.hero-profile span{width:43px;height:43px;font-size:14px}
+.hero-main{min-height:0}
+.hero-top{height:65px;min-height:65px;padding:0 34px}
+.hero-top button{width:34px;height:34px}
+.hero-top button svg{width:22px;height:22px}
+.hero-content{padding:0 30px 24px}
+.hero-banner{padding:0 28px 22px;background:radial-gradient(ellipse at 30% 47%,#6131a4 0%,#39205f 31%,#21163e 61%,#111127 100%)}
+.hero-banner:before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 28% 50%,#8e4cff44,transparent 48%),linear-gradient(110deg,#25174422,transparent 65%)}
+.hero-wave{height:190px;border-top:2px solid #9d55ff88;filter:drop-shadow(0 0 13px #9c4cff);opacity:.9}
+.wave-one{bottom:7px;transform:rotate(-5deg)}
+.wave-two{bottom:35px;transform:rotate(6deg);opacity:.6}
+.hero-copy{width:min(100%,1180px);grid-template-columns:minmax(300px,.9fr) minmax(380px,1.1fr);gap:46px;padding:0 10px}
+.hero-mascot{width:100%;height:100%;max-height:350px;min-height:250px}
+.hero-mascot>.nexa-art-wrap{width:100%;height:100%;max-width:390px;max-height:350px}
+.nexa-art-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;animation:nexa-float 4.5s ease-in-out infinite}
+.nexa-art{display:block;width:100%;height:100%;max-width:390px;max-height:350px;object-fit:contain;filter:drop-shadow(0 15px 22px #090513aa)}
+.nexa-art-small{width:46px;height:42px;max-width:46px;max-height:42px;animation:none;flex:0 0 46px}
+.nexa-art-small .nexa-art{width:100%;height:100%;filter:drop-shadow(0 3px 5px #0008)}
+.hero-message{min-width:0}
+.hero-message h1{font-size:clamp(30px,3vw,48px);line-height:1.08;letter-spacing:-1.5px;margin:0 0 18px}
+.hero-message h1 span{font-size:.82em}
+.hero-message p{font-size:clamp(14px,1.15vw,19px);line-height:1.55}
+.hero-search{width:min(84%,1080px);height:66px;margin:12px auto 26px;padding:7px 8px 7px 25px;gap:16px}
+.hero-search>svg{width:25px;height:25px}
+.hero-search input{font-size:clamp(14px,1.05vw,18px)}
+.hero-search button{width:48px;height:48px}
+.hero-search button svg{width:22px;height:22px}
+.hero-actions{width:min(90%,1120px);gap:18px}
+.hero-actions button{height:68px;border-radius:16px;font-size:clamp(12px,1vw,17px);gap:13px;border-color:#9960e9;background:linear-gradient(145deg,#39245e,#241b42);box-shadow:0 7px 22px #08051377,inset 0 1px #ffffff20}
+.hero-actions button span{color:#d8bcff}
+.hero-actions button svg{width:25px;height:25px}
+.hero-api{display:none}
+@keyframes nexa-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@media(max-width:1000px){
+ .hero-shell{grid-template-columns:190px minmax(0,1fr)}
+ .hero-sidebar{padding:22px 14px}
+ .hero-brand-mark{width:54px;height:54px}
+ .hero-copy{grid-template-columns:minmax(210px,.8fr) minmax(270px,1.2fr);gap:18px}
+ .hero-mascot{min-height:210px;max-height:290px}
+ .nexa-art-wrap,.nexa-art{max-height:290px}
+ .hero-message h1{font-size:clamp(25px,3vw,36px)}
+ .hero-actions{gap:9px;width:96%}
+}
+@media(max-width:760px){
+ .hero-shell{width:calc(100% - 12px);height:calc(100dvh - 12px);min-height:0;margin:6px auto;grid-template-columns:145px minmax(0,1fr)}
+ .hero-sidebar{padding:16px 9px}
+ .hero-brand{gap:7px;padding:0 2px 24px}
+ .hero-brand-mark{width:40px;height:40px}
+ .hero-brand b{font-size:14px}
+ .hero-sidebar nav{gap:5px}
+ .hero-sidebar nav button{height:37px;font-size:10px;padding:0 7px;gap:7px}
+ .hero-sidebar nav button svg{width:15px;height:15px}
+ .hero-profile{font-size:10px;gap:7px}
+ .hero-profile span{width:28px;height:28px}
+ .hero-top{height:38px;min-height:38px;padding:0 12px}
+ .hero-content{padding:0 8px 10px}
+ .hero-banner{padding:0 8px 14px}
+ .hero-copy{grid-template-columns:minmax(125px,.8fr) minmax(0,1.2fr);gap:7px}
+ .hero-mascot{min-height:140px;max-height:210px}
+ .nexa-art-wrap,.nexa-art{max-height:210px}
+ .hero-message h1{font-size:clamp(18px,3vw,26px);letter-spacing:-.5px}
+ .hero-message p{font-size:10px}
+ .hero-search{width:96%;height:46px;margin:5px auto 12px;padding-left:13px}
+ .hero-search button{width:34px;height:34px}
+ .hero-search>svg{width:17px;height:17px}
+ .hero-search input{font-size:11px}
+ .hero-actions{width:98%;gap:6px}
+ .hero-actions button{height:42px;border-radius:9px;font-size:9px;gap:5px}
+ .hero-actions button svg{width:16px;height:16px}
+}
+@media(max-width:520px){
+ .hero-shell{display:block;width:100%;height:100dvh;margin:0;border:0;border-radius:0}
+ .hero-sidebar{position:fixed;inset:0 auto 0 0;width:175px;transform:translateX(-100%);z-index:7}
+ .hero-sidebar.open{transform:translateX(0)}
+ .hero-main{height:100dvh;min-height:0}
+ .hero-top .hamb{display:grid}
+ .hero-content{height:calc(100% - 38px);padding:0 10px 12px}
+ .hero-banner{min-height:0;height:100%;padding:0 8px 14px}
+ .hero-copy{grid-template-columns:112px minmax(0,1fr);min-height:180px;gap:5px}
+ .hero-mascot{min-height:130px;max-height:170px}
+ .nexa-art-wrap,.nexa-art{max-height:170px}
+ .hero-message h1{font-size:18px}
+ .hero-message p{font-size:9px}
+ .hero-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hero-actions button{height:39px;font-size:9px}
+ .hero-scrim{display:block}
+}
