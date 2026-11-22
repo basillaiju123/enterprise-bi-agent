@@ -117,7 +117,7 @@ def test_cache_accepts_similarity_at_threshold(monkeypatch, tmp_path):
     monkeypatch.setattr(
         semantic_cache,
         "_embed",
-        lambda text: np.array([0.7, (1 - 0.7**2) ** 0.5], dtype=np.float32),
+        lambda text: np.array([0.70, (1 - 0.70**2) ** 0.5], dtype=np.float64),
     )
 
     assert semantic_cache.get_cached_sql("boundary question", "analyst") == "SELECT 1"
