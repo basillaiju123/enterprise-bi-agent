@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import time
 from collections import Counter
 from datetime import datetime, timezone
@@ -20,7 +21,8 @@ import duckdb
 
 load_dotenv()
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 DATASET_PATH = ROOT / "benchmarks" / "datasets" / "groq_eval_50.json"
 DB_PATH = ROOT / "data" / "sample_warehouse.duckdb"
 RESULTS_DIR = ROOT / "benchmarks" / "results"
@@ -122,6 +124,7 @@ def main():
                 "expected_result": json_safe(expected),
             }
             calls_before = usage["calls"]
+            rate_limit_retries_before = nodes.RATE_LIMIT_RETRY_COUNT
 
             try:
                 final_state = graph.invoke(
@@ -151,6 +154,7 @@ def main():
                 })
 
             record["groq_generation_calls"] = usage["calls"] - calls_before
+            record["rate_limit_retry_count"] = nodes.RATE_LIMIT_RETRY_COUNT - rate_limit_retries_before
             record["latency_seconds"] = round(time.perf_counter() - case_started, 3)
             results.append(record)
 
@@ -189,7 +193,11 @@ def main():
             "real_duckdb_execution": True,
             "gold_query_result_oracle": True,
             "llm_judge_calls": 0,
-            "automatic_retries": 0,
+            "sql_correction_retries": False,
+            "rate_limit_retries": True,
+            "rate_limit_retry_count": nodes.RATE_LIMIT_RETRY_COUNT,
+            "sdk_retries": False,
+            "generation_calls_include_failed_http_requests": True,
             "semantic_cache": "bypassed using evaluation_mode",
             "human_approval": "bypassed using evaluation_mode",
         },
@@ -198,7 +206,7 @@ def main():
             "Gold SQL is executed against the same local DuckDB database to produce expected results.",
             "RAG retrieval uses the locally configured Qdrant collection and embedding model; its quality is not independently graded here.",
             "This is a single fixed 50-question test set, not a statistical estimate of production performance.",
-            "Each case is limited to one SQL-generation attempt; correction behavior requires a separate explicitly budgeted experiment.",
+            "SQL correction retries are disabled; transient rate-limit retries may make multiple HTTP attempts for one case. Daily token quota exhaustion is detected and not retried.",
         ],
         "cases": results,
     }
