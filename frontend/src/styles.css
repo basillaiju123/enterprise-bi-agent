@@ -830,15 +830,15 @@ body{overflow:hidden}
 /* Floating Orka assistant widget — React implementation of the supplied interaction */
 .orca-widget{position:fixed;right:25px;bottom:24px;z-index:9999;display:flex;flex-direction:column;align-items:center;perspective:800px;user-select:none;font-family:system-ui,-apple-system,sans-serif}
 .orca-float{animation:orcaFloat 3.2s ease-in-out infinite}
-.orca-tilt{position:relative;width:116px;height:116px;padding:0;border:1px solid rgba(133,111,255,.42);border-radius:27px;overflow:visible;cursor:pointer;transform-style:preserve-3d;transition:transform .15s ease-out,box-shadow .25s ease;background:transparent;box-shadow:0 10px 30px rgba(0,0,0,.28),0 0 22px rgba(151,105,255,.18)}
-.orca-img{display:block;width:100%;height:100%;object-fit:cover;border-radius:26px;filter:drop-shadow(0 0 12px rgba(79,243,255,.45));transition:transform .2s cubic-bezier(.34,1.56,.64,1),filter .3s ease}
+.orca-tilt{position:relative;width:118px;height:118px;padding:0;border:0;border-radius:0;overflow:visible;cursor:pointer;transform-style:preserve-3d;transition:transform .15s ease-out;background:transparent;box-shadow:none}
+.orca-img{display:block;width:100%;height:100%;object-fit:contain;border-radius:0;filter:drop-shadow(0 8px 14px rgba(79,243,255,.22));transition:transform .2s cubic-bezier(.34,1.56,.64,1),filter .3s ease}
 .orca-tilt:hover .orca-img{transform:scale(1.055);filter:drop-shadow(0 0 19px rgba(79,243,255,.72))}
 .orca-tilt:active .orca-img{transform:scale(.94)}
-.orca-shadow{position:absolute;bottom:-13px;left:50%;width:62%;height:10px;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(79,243,255,.32),transparent 70%);border-radius:50%;animation:orcaShadow 3.2s ease-in-out infinite;pointer-events:none}
+.orca-shadow{position:absolute;bottom:-5px;left:50%;width:58%;height:9px;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(79,243,255,.26),transparent 70%);border-radius:50%;animation:orcaShadow 3.2s ease-in-out infinite;pointer-events:none}
 .orca-bubble{margin-bottom:10px;padding:8px 14px;background:#17112c;color:#e5faff;border:1px solid rgba(155,125,255,.5);border-radius:14px;font-size:12px;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.28);opacity:0;transform:translateY(6px);transition:opacity .25s ease,transform .25s ease;pointer-events:none}
 .orca-widget:hover .orca-bubble,.orca-widget.show-bubble .orca-bubble,.orca-widget.thinking .orca-bubble{opacity:1;transform:translateY(0)}
 .orca-widget.thinking .orca-float{animation-duration:1.2s}
 .orca-widget.thinking .orca-img{filter:drop-shadow(0 0 24px rgba(79,243,255,.95))}
 @keyframes orcaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 @keyframes orcaShadow{0%,100%{transform:translateX(-50%) scale(1);opacity:.7}50%{transform:translateX(-50%) scale(.75);opacity:.35}}
-@media(max-width:650px){.orca-widget{right:14px;bottom:14px}.orca-tilt{width:86px;height:86px;border-radius:21px}.orca-img{border-radius:20px}.orca-bubble{font-size:10px;padding:7px 10px}}
+@media(max-width:650px){.orca-widget{right:14px;bottom:14px}.orca-tilt{width:92px;height:92px;border-radius:0}.orca-img{border-radius:0}.orca-bubble{font-size:10px;padding:7px 10px}}
