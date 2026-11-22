@@ -134,6 +134,7 @@ def main():
                 "authorization_error": "",
                 "execution_error": "",
                 "query_result": [],
+                "query_columns": [],
                 "retry_count": 0,
                 "expected_result": expected,
                 "evaluation_mode": True,
