@@ -14,3 +14,8 @@ data/hitl_checkpoints.sqlite-shm
 data/hitl_checkpoints.sqlite-wal
 data/semantic_cache_backup.sqlite
 evaluation_output.txt
+
+# Frontend dependencies and environment
+node_modules/
+frontend/.env
+frontend/dist/

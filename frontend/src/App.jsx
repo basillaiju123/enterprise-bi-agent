@@ -20,7 +20,7 @@ function Orka3D({mood='idle',small=false,onClick,className=''}) {
    role={onClick?'button':'img'} tabIndex={onClick?0:undefined} aria-label="Orka interactive orca mascot"
    onPointerMove={onPointerMove} onPointerLeave={reset}
    onClick={onClick} onKeyDown={e=>{if(onClick&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onClick();}}}>
-   <img src="/images/orka-mascot.webp" alt="Orka.ai friendly 3D orca mascot" draggable="false"/>
+   <img src="/images/orka-mascot.png" alt="Orka.ai friendly 3D orca mascot" draggable="false"/>
  </div>;
 }
 function Robot({mood='idle',small=false,onClick}) {return <Orka3D mood={mood} small={small} onClick={onClick}/>;}
