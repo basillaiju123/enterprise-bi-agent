@@ -24,10 +24,10 @@ function Orka3D({mood='idle',small=false,onClick,className=''}) {
  </div>;
 }
 function Robot({mood='idle',small=false,onClick}) {return <Orka3D mood={mood} small={small} onClick={onClick}/>;}
-function OrcaWidget({thinking,listening,onOpenChat}) {
+function OrcaWidget({thinking,listening,resultReady,onOpenChat}) {
  const [bubble,setBubble]=useState(false);
  return <div className={'orca-widget '+(thinking?'thinking ':'')+(listening?'listening ':'')+(bubble?'show-bubble':'')}>
-  <div className="orca-bubble">{thinking?'Thinking... analyzing your data':listening?'I’m listening.':'Hi! Ask Orka anything.'}</div>
+  <div className="orca-bubble">{thinking?'Thinking... analyzing your data':resultReady?'Here’s what I found!':listening?'I’m listening.':'Hi! Ask Orka anything.'}</div>
   <div className="orca-float"><button className="orca-tilt" type="button" aria-label="Open Orka AI chat" onClick={()=>{setBubble(v=>!v);onOpenChat?.();}}><Orka3D mood={thinking?'think':listening?'listen':'idle'} small/><span className="orca-shadow"/></button></div>
  </div>;
 }
@@ -60,7 +60,7 @@ export default function App(){
     <footer className="hero-footer"><span>© 2026 orka.ai</span><span><i className={'dot '+health}/> Secure, API-powered analytics</span></footer>
    </section>
   </main>
-  <OrcaWidget thinking={busy} listening={listening} onOpenChat={()=>input.current?.focus()}/>
+  <OrcaWidget thinking={busy} listening={listening} resultReady={!busy&&!!messages[messages.length-1]?.answer} onOpenChat={()=>input.current?.focus()}/>
   {toast&&<div className="toast"><CheckCircle2 size={16}/>{toast}<button onClick={()=>setToast('')}><X size={14}/></button></div>}
  </div>;
 }
