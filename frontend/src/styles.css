@@ -813,3 +813,15 @@ body{overflow:hidden}
  .hero-banner{min-height:calc(100dvh - 43px)!important}
  .conversation{width:calc(100% - 20px)}
 }
+
+
+/* Orka.ai 3D mascot image */
+.orka-avatar{width:100%;height:100%;display:grid;place-items:center;animation:orka-hover 4s ease-in-out infinite;}
+.orka-avatar img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 16px 22px rgba(0,0,0,.28));}
+.orka-avatar-small{width:42px;height:46px;flex:0 0 42px;animation-duration:4.5s;}
+.orka-avatar-small img{width:100%;height:100%;}
+.orka-avatar-think img{filter:drop-shadow(0 0 14px rgba(70,225,255,.35));}
+@keyframes orka-hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.hero-mascot>.orka-avatar{width:100%;height:100%;}
+.hero-brand-mark .orka-avatar-small{width:100%;height:100%;}
+@media(max-width:650px){.hero-mascot>.orka-avatar{width:100%;height:100%;}}
