@@ -69,8 +69,9 @@ def main():
     original_create = nodes.client.chat.completions.create
 
     def tracked_create(*args, **kwargs):
-        response = original_create(*args, **kwargs)
+        # Count attempted API requests, including requests that raise an exception.
         usage["calls"] += 1
+        response = original_create(*args, **kwargs)
         token_usage = getattr(response, "usage", None)
         if token_usage is not None:
             usage["prompt_tokens"] += getattr(token_usage, "prompt_tokens", 0) or 0
