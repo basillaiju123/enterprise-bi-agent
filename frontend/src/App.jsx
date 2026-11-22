@@ -18,7 +18,7 @@ function Robot({mood='idle',small=false,onClick}) {
   onMouseMove={track} onMouseLeave={()=>setTilt({x:0,y:0})}
   onClick={onClick} onKeyDown={e=>{if(onClick&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onClick();}}}
   style={{'--orka-tilt-x':tilt.x+'deg','--orka-tilt-y':tilt.y+'deg'}}>
-  <img src="/images/orca-avatar.png" alt="Orka AI friendly 3D robot mascot" />
+  <img src="/images/orca-avatar-live.gif" alt="Orka AI friendly 3D robot mascot" />
  </div>;
 }
 
@@ -35,7 +35,7 @@ function OrcaWidget({thinking,onOpenChat}) {
   <div className="orca-bubble">{thinking?'Orka is thinking...':'Hi! Ask Orka anything.'}</div>
   <div className="orca-float">
    <button className="orca-tilt" type="button" aria-label="Open Orka AI chat" onMouseMove={track} onMouseLeave={()=>setTilt({x:0,y:0})} onClick={()=>{setBubble(v=>!v);onOpenChat?.();}} style={{transform:`rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`}}>
-    <img src="/images/orca-avatar.png" alt="Orka AI mascot" className="orca-img"/>
+    <img src="/images/orca-avatar-live.gif" alt="Orka AI mascot" className="orca-img"/>
     <span className="orca-shadow"/>
    </button>
   </div>
