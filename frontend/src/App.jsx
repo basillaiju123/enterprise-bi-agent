@@ -27,7 +27,7 @@ function Robot({mood='idle',small=false,onClick}) {return <Orka3D mood={mood} sm
 function OrcaWidget({thinking,listening,resultReady,onOpenChat}) {
  const [bubble,setBubble]=useState(false);
  return <div className={'orca-widget '+(thinking?'thinking ':'')+(listening?'listening ':'')+(bubble?'show-bubble':'')}>
-  <div className="orca-bubble">{thinking?'Thinking... analyzing your data':resultReady?'Here’s what I found!':listening?'I’m listening.':'Hi! Ask Orka anything.'}</div>
+  <div className="orca-bubble">{thinking?'Thinking... analyzing your data':resultReady?'Here’s what I found!':listening?'I’m listening.':'Welcome back! How can I help you today?'}</div>
   <div className="orca-float"><button className="orca-tilt" type="button" aria-label="Open Orka AI chat" onClick={()=>{setBubble(v=>!v);onOpenChat?.();}}><Orka3D mood={thinking?'think':listening?'listen':'idle'} small/><span className="orca-shadow"/></button></div>
  </div>;
 }
