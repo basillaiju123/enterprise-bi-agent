@@ -610,3 +610,47 @@ body{overflow:hidden}
 @media(max-width:760px){
  .hero-banner{padding:0 8px 14px}
 }
+
+
+/* Inset hero canvas with a soft, flowing aurora gradient */
+.hero-banner{
+ width:calc(100% - 42px);
+ height:auto;
+ min-height:0;
+ flex:1 1 auto;
+ margin:14px auto 16px;
+ border-radius:22px;
+ overflow:hidden;
+ background:
+  radial-gradient(ellipse 55% 72% at 24% 52%,rgba(143,75,226,.54) 0%,rgba(106,54,180,.28) 42%,transparent 76%),
+  radial-gradient(ellipse 48% 58% at 78% 28%,rgba(105,77,205,.28) 0%,transparent 72%),
+  radial-gradient(ellipse 65% 45% at 60% 105%,rgba(127,68,205,.34) 0%,transparent 75%),
+  linear-gradient(118deg,#211331 0%,#382052 36%,#2b1b4a 68%,#17142f 100%);
+ box-shadow:0 18px 50px rgba(4,3,15,.28),inset 0 1px rgba(255,255,255,.06);
+}
+.hero-banner:before{
+ inset:-15%;
+ background:
+  radial-gradient(ellipse 56% 42% at 22% 47%,rgba(177,112,255,.34),transparent 72%),
+  radial-gradient(ellipse 54% 38% at 82% 72%,rgba(102,119,255,.22),transparent 72%),
+  radial-gradient(ellipse 46% 28% at 53% 4%,rgba(183,111,255,.18),transparent 75%);
+ filter:blur(34px);
+ opacity:.95;
+}
+.hero-banner:after{
+ content:"";position:absolute;z-index:-1;pointer-events:none;
+ width:145%;height:58%;left:-20%;bottom:-19%;
+ border-radius:48%;
+ transform:rotate(-8deg);
+ background:
+  linear-gradient(105deg,transparent 0%,rgba(112,67,214,.05) 17%,rgba(177,112,255,.23) 38%,rgba(103,94,226,.18) 57%,rgba(190,126,255,.16) 72%,transparent 92%);
+ filter:blur(32px);
+ opacity:.9;
+}
+.hero-wave{display:none!important}
+@media(max-width:760px){
+ .hero-banner{width:calc(100% - 18px);margin:9px auto 10px;border-radius:16px}
+}
+@media(max-width:520px){
+ .hero-banner{width:calc(100% - 12px);margin:6px auto 8px}
+}
