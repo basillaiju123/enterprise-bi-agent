@@ -1464,3 +1464,48 @@ body{overflow:hidden}
 @media(prefers-reduced-motion:reduce) {
   .hero-mascot>.orka-welcome-greeting { animation:none !important; }
 }
+
+
+/* Transparent, compact draggable Orka companion */
+.orca-widget {
+  width: max-content !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  overflow: visible !important;
+  touch-action: none;
+}
+.orca-widget::before,
+.orca-widget::after { content: none !important; display: none !important; }
+.orca-float { background: transparent !important; border: 0 !important; box-shadow: none !important; }
+.orca-tilt {
+  width: 84px !important;
+  height: 84px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  cursor: grab !important;
+  touch-action: none;
+}
+.orca-tilt:active { cursor: grabbing !important; }
+.orca-tilt .orka-scene-small {
+  width: 84px !important;
+  height: 84px !important;
+  flex: 0 0 84px !important;
+}
+.orca-bubble {
+  max-width: min(280px, calc(100vw - 24px));
+  white-space: normal !important;
+  text-align: center;
+}
+@media(max-width:650px) {
+  .orca-widget { right: 12px; bottom: 12px; }
+  .orca-tilt { width: 72px !important; height: 72px !important; }
+  .orca-tilt .orka-scene-small { width:72px !important;height:72px !important;flex-basis:72px !important; }
+}
