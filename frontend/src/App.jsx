@@ -7,6 +7,26 @@ const cell=(v)=>v==null?'—':typeof v==='object'?JSON.stringify(v):String(v);
 
 function Robot({mood='idle',small=false}){return <div className={'orka-avatar '+(small?'orka-avatar-small ':'')+'orka-avatar-'+mood} role="img" aria-label="Orka AI 3D virtual assistant"><img src="/images/orka-avatar.png" alt="Orka AI friendly 3D robot mascot" /></div>}
 
+function OrcaWidget({thinking,onOpenChat}) {
+ const [bubble,setBubble]=useState(false);
+ const [tilt,setTilt]=useState({x:0,y:0});
+ function track(e){
+  const r=e.currentTarget.getBoundingClientRect();
+  const dx=(e.clientX-(r.left+r.width/2))/(window.innerWidth/2);
+  const dy=(e.clientY-(r.top+r.height/2))/(window.innerHeight/2);
+  setTilt({x:Math.max(-22,Math.min(22,-dy*22)),y:Math.max(-22,Math.min(22,dx*22))});
+ }
+ return <div className={'orca-widget '+(thinking?'thinking':'')+(bubble?' show-bubble':'')}>
+  <div className="orca-bubble">{thinking?'Orka is thinking...':'Hi! Ask Orka anything.'}</div>
+  <div className="orca-float">
+   <button className="orca-tilt" type="button" aria-label="Open Orka AI chat" onMouseMove={track} onMouseLeave={()=>setTilt({x:0,y:0})} onClick={()=>{setBubble(v=>!v);onOpenChat?.();}} style={{transform:`rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`}}>
+    <img src="/images/orca-avatar.jpg" alt="Orka AI mascot" className="orca-img"/>
+    <span className="orca-shadow"/>
+   </button>
+  </div>
+ </div>;
+}
+
 function Result({data,onCsv}){const rows=rowsOf(data.result);return <div className="result-card"><div className="result-head"><div className="bot-avatar"><Bot size={17}/></div><div><b>orka.ai</b><small>ANALYSIS COMPLETE</small></div><span className="done"><CheckCircle2 size={12}/> Returned</span></div>{data.error&&<p className="warn"><AlertTriangle size={14}/>{data.error}</p>}{data.sql&&<details open className="sql"><summary><span><Terminal size={14}/> Generated SQL</span><ChevronDown size={14}/></summary><pre>{data.sql}</pre></details>}<div className="table-head"><div><b><Table2 size={15}/> Query results</b><small>{rows.length} rows returned</small></div>{rows.length>0&&<button onClick={()=>onCsv(data)}><ArrowDownToLine size={13}/> CSV</button>}</div>{rows.length?<div className="table-scroll"><table><thead><tr>{rows[0].map((_,i)=><th key={i}>Column {i+1}</th>)}</tr></thead><tbody>{rows.slice(0,100).map((r,i)=><tr key={i}>{r.map((v,j)=><td key={j}>{cell(v)}</td>)}</tr>)}</tbody></table></div>:<div className="empty">No rows returned.</div>}<div className="result-meta"><span><CheckCircle2 size={12}/> Workflow finished</span><span>{data.retries||0} retries</span><span>{data.cache_hit?'Cache hit':'Fresh query'}</span></div></div>}
 
 export default function App(){
@@ -35,6 +55,7 @@ export default function App(){
     <footer className="hero-footer"><span>© 2026 orka.ai</span><span><i className={'dot '+health}/> Secure, API-powered analytics</span></footer>
    </section>
   </main>
+  <OrcaWidget thinking={busy} onOpenChat={()=>input.current?.focus()}/>
   {toast&&<div className="toast"><CheckCircle2 size={16}/>{toast}<button onClick={()=>setToast('')}><X size={14}/></button></div>}
  </div>;
 }
