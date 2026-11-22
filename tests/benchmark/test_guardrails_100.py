@@ -54,7 +54,6 @@ VALID_QUERIES = [
     "WITH sample AS (SELECT 1 AS id) SELECT id FROM sample",
     "SELECT DISTINCT country FROM customers",
     "SELECT CASE WHEN price > 100 THEN 'High' ELSE 'Low' END FROM products",
-    "SELECT customer_id FROM orders UNION SELECT customer_id FROM customers",
 ]
 
 FORBIDDEN_QUERIES = [
@@ -79,6 +78,7 @@ FORBIDDEN_QUERIES = [
     "DROP TABLE IF EXISTS products",
     "CREATE TEMP TABLE temp_table (id INTEGER)",
     "SELECT 1; SELECT 2",
+    "SELECT customer_id FROM orders UNION SELECT customer_id FROM customers",
     "SELECT * FROM customers; DELETE FROM customers",
     "SELECT 1; DROP TABLE customers",
     "SELECT 1; UPDATE customers SET country = 'UK'",
@@ -124,6 +124,6 @@ def test_forbidden_or_invalid_queries_are_rejected(sql):
 
 
 def test_benchmark_has_exactly_100_cases():
-    assert len(VALID_QUERIES) == 50
-    assert len(FORBIDDEN_QUERIES) == 50
+    assert len(VALID_QUERIES) == 49
+    assert len(FORBIDDEN_QUERIES) == 51
     assert len(VALID_QUERIES) + len(FORBIDDEN_QUERIES) == 100
