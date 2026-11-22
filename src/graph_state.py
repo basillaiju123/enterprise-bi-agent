@@ -10,6 +10,7 @@ class AgentState(TypedDict):
     authorization_error: str
     execution_error: str
     query_result: list
+    query_columns: list
     retry_count: int
     expected_result: list
     evaluation_mode: bool
