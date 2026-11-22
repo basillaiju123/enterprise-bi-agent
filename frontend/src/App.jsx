@@ -5,7 +5,7 @@ const SUGGESTIONS=['How many customers are from India?','Show the top 5 customer
 const rowsOf=(data)=>Array.isArray(data)?data.map(r=>Array.isArray(r)?r:(r&&typeof r==='object'?Object.values(r):[r])):[];
 const cell=(v)=>v==null?'—':typeof v==='object'?JSON.stringify(v):String(v);
 
-function Robot({mood='idle',small=false}){return <div className={'orka-avatar '+(small?'orka-avatar-small ':'')+'orka-avatar-'+mood} role="img" aria-label="Orka AI 3D virtual assistant"><img src="/images/orka-avatar.png" alt="Orka AI friendly 3D robot mascot" /></div>}
+function Robot({mood='idle',small=false}){return <div className={'orka-avatar '+(small?'orka-avatar-small ':'')+'orka-avatar-'+mood} role="img" aria-label="Orka AI 3D virtual assistant"><img src="/images/orca-avatar.jpg" alt="Orka AI friendly 3D robot mascot" /></div>}
 
 function OrcaWidget({thinking,onOpenChat}) {
  const [bubble,setBubble]=useState(false);
