@@ -859,3 +859,20 @@ body{overflow:hidden}
 .orka-avatar-think img{filter:drop-shadow(0 0 13px rgba(77,225,255,.55)) drop-shadow(0 16px 22px rgba(0,0,0,.28))}
 @keyframes orka-thinking-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.025)}}
 @media(prefers-reduced-motion:reduce){.orka-avatar,.orka-avatar img{animation:none!important;transition:none!important}}
+
+
+/* Orka live companion: responsive 3D gaze, idle motion and clear interaction states */
+.orka-avatar{transform-style:preserve-3d;will-change:transform}
+.orka-avatar img{backface-visibility:hidden;will-change:transform;transition:transform .16s cubic-bezier(.2,.75,.25,1),filter .25s ease}
+.orka-avatar[role="button"]:hover img{filter:drop-shadow(0 0 18px rgba(75,226,255,.5)) drop-shadow(0 16px 22px rgba(0,0,0,.28)) brightness(1.04)}
+.orka-avatar-listen img{filter:drop-shadow(0 0 18px rgba(75,226,255,.65)) drop-shadow(0 16px 22px rgba(0,0,0,.28));}
+.orka-avatar-listen{animation:orka-listen-bob 2s ease-in-out infinite}
+.orka-avatar-think{animation:orka-thinking-float 1.15s ease-in-out infinite}
+.orka-avatar-think img{filter:drop-shadow(0 0 20px rgba(75,226,255,.82)) drop-shadow(0 16px 22px rgba(0,0,0,.28))}
+@keyframes orka-listen-bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.015)}}
+@keyframes orka-thinking-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-11px) scale(1.035)}}
+.orca-widget.listening .orca-float{animation-duration:2s}
+.orca-widget.listening .orca-img{filter:drop-shadow(0 0 20px rgba(79,243,255,.78));}
+.orca-widget.listening .orca-bubble{border-color:rgba(79,243,255,.7)}
+.orca-tilt:focus-visible{outline:2px solid #8eeaff;outline-offset:5px;border-radius:28px}
+@media(prefers-reduced-motion:reduce){.orka-avatar-listen,.orka-avatar-think,.orca-float,.orca-shadow{animation:none!important}}
