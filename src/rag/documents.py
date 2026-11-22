@@ -41,6 +41,11 @@ BUSINESS_SYNONYMS = {
         "average revenue per order",
         "average order revenue",
     ],
+    "Country Name Aliases": [
+        "United Kingdom",
+        "UK country code",
+        "customers from the UK",
+    ],
 }
 
 
