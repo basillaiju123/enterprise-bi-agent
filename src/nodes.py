@@ -24,7 +24,7 @@ def _rate_limit_wait_seconds(error: RateLimitError, attempt: int) -> float:
     """Read Groq's suggested wait from the error, else use bounded backoff."""
     message = str(error)
     match = re.search(
-        r"try again in\\s+([0-9.]+)\\s*(ms|milliseconds|s|seconds|minutes)",
+        r"try again in\s+([0-9.]+)\s*(ms|milliseconds|s|seconds|minutes)",
         message,
         re.IGNORECASE,
     )
