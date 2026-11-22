@@ -1430,3 +1430,18 @@ body{overflow:hidden}
   .conversation-message .answer-highlight { min-height: 88px; padding: 15px; gap: 12px; }
   .conversation-message .answer-highlight small { display: none; }
 }
+
+
+/* Remove the hero banner's translucent rectangular surface on the main page */
+.hero-banner {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.hero-banner::before {
+  content: none !important;
+  display: none !important;
+}
