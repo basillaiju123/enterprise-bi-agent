@@ -5,7 +5,22 @@ const SUGGESTIONS=['How many customers are from India?','Show the top 5 customer
 const rowsOf=(data)=>Array.isArray(data)?data.map(r=>Array.isArray(r)?r:(r&&typeof r==='object'?Object.values(r):[r])):[];
 const cell=(v)=>v==null?'—':typeof v==='object'?JSON.stringify(v):String(v);
 
-function Robot({mood='idle',small=false}){return <div className={'orka-avatar '+(small?'orka-avatar-small ':'')+'orka-avatar-'+mood} role="img" aria-label="Orka AI 3D virtual assistant"><img src="/images/orca-avatar.png" alt="Orka AI friendly 3D robot mascot" /></div>}
+function Robot({mood='idle',small=false,onClick}) {
+ const [tilt,setTilt]=useState({x:0,y:0});
+ function track(e){
+  const r=e.currentTarget.getBoundingClientRect();
+  const dx=(e.clientX-(r.left+r.width/2))/(r.width/2);
+  const dy=(e.clientY-(r.top+r.height/2))/(r.height/2);
+  setTilt({x:Math.max(-10,Math.min(10,-dy*10)),y:Math.max(-13,Math.min(13,dx*13))});
+ }
+ return <div className={'orka-avatar '+(small?'orka-avatar-small ':'')+'orka-avatar-'+mood}
+  role={onClick?'button':'img'} tabIndex={onClick?0:undefined} aria-label="Orka AI 3D virtual assistant"
+  onMouseMove={track} onMouseLeave={()=>setTilt({x:0,y:0})}
+  onClick={onClick} onKeyDown={e=>{if(onClick&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onClick();}}}
+  style={{'--orka-tilt-x':tilt.x+'deg','--orka-tilt-y':tilt.y+'deg'}}>
+  <img src="/images/orca-avatar.png" alt="Orka AI friendly 3D robot mascot" />
+ </div>;
+}
 
 function OrcaWidget({thinking,onOpenChat}) {
  const [bubble,setBubble]=useState(false);
@@ -45,7 +60,7 @@ export default function App(){
   {menu&&<button className="hero-scrim" onClick={()=>setMenu(false)}/>}
   <main className="hero-main"><header className="hero-top"><button className="hamb" onClick={()=>setMenu(true)}><Menu/></button><span className="top-spacer"/><button aria-label="Notifications"><Bell/></button><button aria-label="Profile"><UserCircle/></button></header>
    <section className="hero-content">
-    <div className="hero-banner"><div className="hero-wave wave-one"/><div className="hero-wave wave-two"/><div className="hero-copy"><div className="hero-mascot"><Robot/></div><div className="hero-message"><h1>Hi Basil, I’m Orka<br/>Your Enterprise BI Assistant <span>👋</span></h1><p>Ask questions, analyze data, generate reports,<br/>or let me run end-to-end analytics for you.</p><div className="hero-api"><i className={'dot '+health}/>{health==='online'?'Connected and ready':health==='checking'?'Connecting to your API':'API connection unavailable'}</div></div></div>
+    <div className="hero-banner"><div className="hero-wave wave-one"/><div className="hero-wave wave-two"/><div className="hero-copy"><div className="hero-mascot"><Robot mood={busy?'think':'idle'} onClick={()=>input.current?.focus()}/></div><div className="hero-message"><h1>Hi Basil, I’m Orka<br/>Your Enterprise BI Assistant <span>👋</span></h1><p>Ask questions, analyze data, generate reports,<br/>or let me run end-to-end analytics for you.</p><div className="hero-api"><i className={'dot '+health}/>{health==='online'?'Connected and ready':health==='checking'?'Connecting to your API':'API connection unavailable'}</div></div></div>
      <form className="hero-search" onSubmit={e=>{e.preventDefault();ask()}}><Sparkles/><input ref={input} value={q} onChange={e=>setQ(e.target.value)} placeholder="Ask orka.ai anything about your data..." disabled={busy||!!pending}/><button type="submit" disabled={!q.trim()||busy||!!pending}><Send/></button></form>
      <div className="hero-actions">{actions.map(a=><button key={a.label} onClick={()=>ask(a.question)}><span>{a.icon}</span>{a.label}</button>)}</div>
     </div>
