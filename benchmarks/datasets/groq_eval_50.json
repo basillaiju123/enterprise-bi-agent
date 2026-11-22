@@ -1,0 +1,309 @@
+{
+  "title": "Orka.ai Groq live SQL evaluation",
+  "version": 1,
+  "model": "openai/gpt-oss-20b",
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Gold SQL is executed locally to calculate expected results. Cases are grouped by evaluation focus; categories are not isolated model capabilities.",
+  "cases": [
+    {
+      "id": "G001",
+      "category": "sql_generation",
+      "question": "How many customers are in the customer database?",
+      "gold_sql": "SELECT COUNT(*) AS customer_count FROM customers;"
+    },
+    {
+      "id": "G002",
+      "category": "sql_generation",
+      "question": "Count customers whose country is India.",
+      "gold_sql": "SELECT COUNT(*) AS customer_count FROM customers WHERE country = 'India';"
+    },
+    {
+      "id": "G003",
+      "category": "sql_generation",
+      "question": "How many customers live in the United Kingdom?",
+      "gold_sql": "SELECT COUNT(*) AS customer_count FROM customers WHERE country = 'UK';"
+    },
+    {
+      "id": "G004",
+      "category": "sql_generation",
+      "question": "Show every customer name in alphabetical order.",
+      "gold_sql": "SELECT customer_name FROM customers ORDER BY customer_name;"
+    },
+    {
+      "id": "G005",
+      "category": "sql_generation",
+      "question": "List the names of customers located in Germany.",
+      "gold_sql": "SELECT customer_name FROM customers WHERE country = 'Germany' ORDER BY customer_name;"
+    },
+    {
+      "id": "G006",
+      "category": "sql_generation",
+      "question": "How many customers signed up after March 1, 2025?",
+      "gold_sql": "SELECT COUNT(*) AS customer_count FROM customers WHERE signup_date > DATE '2025-03-01';"
+    },
+    {
+      "id": "G007",
+      "category": "sql_generation",
+      "question": "How many products are listed?",
+      "gold_sql": "SELECT COUNT(*) AS product_count FROM products;"
+    },
+    {
+      "id": "G008",
+      "category": "sql_generation",
+      "question": "List the products in the Electronics category.",
+      "gold_sql": "SELECT product_name FROM products WHERE category = 'Electronics' ORDER BY product_name;"
+    },
+    {
+      "id": "G009",
+      "category": "sql_generation",
+      "question": "Which product has the highest price? Return its name and price.",
+      "gold_sql": "SELECT product_name, price FROM products ORDER BY price DESC, product_name LIMIT 1;"
+    },
+    {
+      "id": "G010",
+      "category": "sql_generation",
+      "question": "Find the least expensive product and its price.",
+      "gold_sql": "SELECT product_name, price FROM products ORDER BY price ASC, product_name LIMIT 1;"
+    },
+    {
+      "id": "G011",
+      "category": "sql_generation",
+      "question": "Count all orders with Completed status.",
+      "gold_sql": "SELECT COUNT(*) AS completed_orders FROM orders WHERE status = 'Completed';"
+    },
+    {
+      "id": "G012",
+      "category": "sql_generation",
+      "question": "How many orders were cancelled?",
+      "gold_sql": "SELECT COUNT(*) AS cancelled_orders FROM orders WHERE status = 'Cancelled';"
+    },
+    {
+      "id": "G013",
+      "category": "sql_generation",
+      "question": "Count orders placed during June 2025.",
+      "gold_sql": "SELECT COUNT(*) AS order_count FROM orders WHERE order_date >= DATE '2025-06-01' AND order_date < DATE '2025-07-01';"
+    },
+    {
+      "id": "G014",
+      "category": "sql_generation",
+      "question": "Show the order IDs and dates for completed orders, oldest first.",
+      "gold_sql": "SELECT order_id, order_date FROM orders WHERE status = 'Completed' ORDER BY order_date, order_id;"
+    },
+    {
+      "id": "G015",
+      "category": "sql_generation",
+      "question": "How many customers signed up during May 2025?",
+      "gold_sql": "SELECT COUNT(*) AS customer_count FROM customers WHERE signup_date >= DATE '2025-05-01' AND signup_date < DATE '2025-06-01';"
+    },
+    {
+      "id": "G016",
+      "category": "execution_correctness",
+      "question": "Count customers in each country.",
+      "gold_sql": "SELECT country, COUNT(*) AS customer_count FROM customers GROUP BY country ORDER BY country;"
+    },
+    {
+      "id": "G017",
+      "category": "execution_correctness",
+      "question": "Show the number of products in each category.",
+      "gold_sql": "SELECT category, COUNT(*) AS product_count FROM products GROUP BY category ORDER BY category;"
+    },
+    {
+      "id": "G018",
+      "category": "execution_correctness",
+      "question": "What is the average price of all products?",
+      "gold_sql": "SELECT AVG(price) AS average_price FROM products;"
+    },
+    {
+      "id": "G019",
+      "category": "execution_correctness",
+      "question": "List products costing more than 100, most expensive first.",
+      "gold_sql": "SELECT product_name, price FROM products WHERE price > 100 ORDER BY price DESC, product_name;"
+    },
+    {
+      "id": "G020",
+      "category": "execution_correctness",
+      "question": "For every order, show its ID, customer name, and status.",
+      "gold_sql": "SELECT o.order_id, c.customer_name, o.status FROM orders o JOIN customers c ON o.customer_id = c.customer_id ORDER BY o.order_id;"
+    },
+    {
+      "id": "G021",
+      "category": "execution_correctness",
+      "question": "How many completed orders were placed by customers from India?",
+      "gold_sql": "SELECT COUNT(DISTINCT o.order_id) AS completed_orders FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.status = 'Completed' AND c.country = 'India';"
+    },
+    {
+      "id": "G022",
+      "category": "execution_correctness",
+      "question": "Show each customer's name and number of orders, including customers with no orders.",
+      "gold_sql": "SELECT c.customer_name, COUNT(o.order_id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.customer_name ORDER BY c.customer_name;"
+    },
+    {
+      "id": "G023",
+      "category": "execution_correctness",
+      "question": "Calculate total revenue from all order items using quantity multiplied by product price.",
+      "gold_sql": "SELECT SUM(oi.quantity * p.price) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id;"
+    },
+    {
+      "id": "G024",
+      "category": "execution_correctness",
+      "question": "Calculate revenue from completed orders only.",
+      "gold_sql": "SELECT SUM(oi.quantity * p.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE o.status = 'Completed';"
+    },
+    {
+      "id": "G025",
+      "category": "execution_correctness",
+      "question": "Calculate revenue from cancelled orders only.",
+      "gold_sql": "SELECT SUM(oi.quantity * p.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE o.status = 'Cancelled';"
+    },
+    {
+      "id": "G026",
+      "category": "rag_grounding",
+      "question": "How many units were purchased across all order items, regardless of order status?",
+      "gold_sql": "SELECT SUM(quantity) AS units_sold FROM order_items;"
+    },
+    {
+      "id": "G027",
+      "category": "rag_grounding",
+      "question": "How many units were included in completed orders?",
+      "gold_sql": "SELECT SUM(oi.quantity) AS completed_units FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'Completed';"
+    },
+    {
+      "id": "G028",
+      "category": "rag_grounding",
+      "question": "Show revenue by product name, highest revenue first.",
+      "gold_sql": "SELECT p.product_name, SUM(oi.quantity * p.price) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_id, p.product_name ORDER BY revenue DESC, p.product_name;"
+    },
+    {
+      "id": "G029",
+      "category": "rag_grounding",
+      "question": "Show total revenue for each product category.",
+      "gold_sql": "SELECT p.category, SUM(oi.quantity * p.price) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.category ORDER BY p.category;"
+    },
+    {
+      "id": "G030",
+      "category": "rag_grounding",
+      "question": "Count orders by their status.",
+      "gold_sql": "SELECT status, COUNT(*) AS order_count FROM orders GROUP BY status ORDER BY status;"
+    },
+    {
+      "id": "G031",
+      "category": "rag_grounding",
+      "question": "What is the average order value for completed orders? Use completed revenue divided by the number of completed orders.",
+      "gold_sql": "SELECT SUM(oi.quantity * p.price) / COUNT(DISTINCT o.order_id) AS average_order_value FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE o.status = 'Completed';"
+    },
+    {
+      "id": "G032",
+      "category": "rag_grounding",
+      "question": "Show the total completed-order spend for each customer.",
+      "gold_sql": "SELECT c.customer_name, SUM(oi.quantity * p.price) AS completed_spend FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE o.status = 'Completed' GROUP BY c.customer_id, c.customer_name ORDER BY completed_spend DESC, c.customer_name;"
+    },
+    {
+      "id": "G033",
+      "category": "rag_grounding",
+      "question": "How many units of each product have been ordered?",
+      "gold_sql": "SELECT p.product_name, COALESCE(SUM(oi.quantity), 0) AS units_ordered FROM products p LEFT JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_id, p.product_name ORDER BY p.product_name;"
+    },
+    {
+      "id": "G034",
+      "category": "rag_grounding",
+      "question": "Which two products generated the most revenue?",
+      "gold_sql": "SELECT p.product_name, SUM(oi.quantity * p.price) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.product_id, p.product_name ORDER BY revenue DESC, p.product_name LIMIT 2;"
+    },
+    {
+      "id": "G035",
+      "category": "rag_grounding",
+      "question": "How many distinct customers have placed completed orders?",
+      "gold_sql": "SELECT COUNT(DISTINCT customer_id) AS customer_count FROM orders WHERE status = 'Completed';"
+    },
+    {
+      "id": "G036",
+      "category": "complex_analytics",
+      "question": "Show completed order counts for each customer country.",
+      "gold_sql": "SELECT c.country, COUNT(DISTINCT o.order_id) AS completed_orders FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE o.status = 'Completed' GROUP BY c.country ORDER BY c.country;"
+    },
+    {
+      "id": "G037",
+      "category": "complex_analytics",
+      "question": "Which customer placed the greatest number of orders? Return the customer name and order count.",
+      "gold_sql": "SELECT c.customer_name, COUNT(o.order_id) AS order_count FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.customer_name ORDER BY order_count DESC, c.customer_name LIMIT 1;"
+    },
+    {
+      "id": "G038",
+      "category": "complex_analytics",
+      "question": "What is the earliest order date?",
+      "gold_sql": "SELECT MIN(order_date) AS earliest_order_date FROM orders;"
+    },
+    {
+      "id": "G039",
+      "category": "complex_analytics",
+      "question": "What is the most recent order date?",
+      "gold_sql": "SELECT MAX(order_date) AS latest_order_date FROM orders;"
+    },
+    {
+      "id": "G040",
+      "category": "complex_analytics",
+      "question": "Count completed orders placed on or after June 10, 2025.",
+      "gold_sql": "SELECT COUNT(*) AS completed_orders FROM orders WHERE status = 'Completed' AND order_date >= DATE '2025-06-10';"
+    },
+    {
+      "id": "G041",
+      "category": "complex_analytics",
+      "question": "What is the average quantity per order-item record?",
+      "gold_sql": "SELECT AVG(quantity) AS average_quantity FROM order_items;"
+    },
+    {
+      "id": "G042",
+      "category": "complex_analytics",
+      "question": "For each country, show the number of completed orders and completed revenue.",
+      "gold_sql": "SELECT c.country, COUNT(DISTINCT o.order_id) AS completed_orders, SUM(oi.quantity * p.price) AS completed_revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE o.status = 'Completed' GROUP BY c.country ORDER BY c.country;"
+    },
+    {
+      "id": "G043",
+      "category": "complex_analytics",
+      "question": "Which products have never appeared in an order item?",
+      "gold_sql": "SELECT p.product_name FROM products p LEFT JOIN order_items oi ON p.product_id = oi.product_id WHERE oi.product_id IS NULL ORDER BY p.product_name;"
+    },
+    {
+      "id": "G044",
+      "category": "sql_correction",
+      "question": "List customer names and countries for customers from India or the UK.",
+      "gold_sql": "SELECT customer_name, country FROM customers WHERE country IN ('India', 'UK') ORDER BY customer_name;"
+    },
+    {
+      "id": "G045",
+      "category": "sql_correction",
+      "question": "Show completed orders with the customer name and order date, sorted newest first.",
+      "gold_sql": "SELECT o.order_id, c.customer_name, o.order_date FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.status = 'Completed' ORDER BY o.order_date DESC, o.order_id;"
+    },
+    {
+      "id": "G046",
+      "category": "sql_correction",
+      "question": "Calculate the number of completed orders per month in 2025.",
+      "gold_sql": "SELECT DATE_TRUNC('month', order_date) AS order_month, COUNT(*) AS completed_orders FROM orders WHERE status = 'Completed' AND order_date >= DATE '2025-01-01' AND order_date < DATE '2026-01-01' GROUP BY DATE_TRUNC('month', order_date) ORDER BY order_month;"
+    },
+    {
+      "id": "G047",
+      "category": "sql_correction",
+      "question": "Show the total quantity sold for each product category.",
+      "gold_sql": "SELECT p.category, SUM(oi.quantity) AS total_units FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.category ORDER BY p.category;"
+    },
+    {
+      "id": "G048",
+      "category": "sql_correction",
+      "question": "Find customers who have at least one cancelled order.",
+      "gold_sql": "SELECT DISTINCT c.customer_name FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE o.status = 'Cancelled' ORDER BY c.customer_name;"
+    },
+    {
+      "id": "G049",
+      "category": "sql_correction",
+      "question": "Calculate the total value of all completed orders for each order ID.",
+      "gold_sql": "SELECT o.order_id, SUM(oi.quantity * p.price) AS order_value FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE o.status = 'Completed' GROUP BY o.order_id ORDER BY o.order_id;"
+    },
+    {
+      "id": "G050",
+      "category": "sql_correction",
+      "question": "Show the top three customers by number of completed orders.",
+      "gold_sql": "SELECT c.customer_name, COUNT(*) AS completed_order_count FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE o.status = 'Completed' GROUP BY c.customer_id, c.customer_name ORDER BY completed_order_count DESC, c.customer_name LIMIT 3;"
+    }
+  ]
+}
