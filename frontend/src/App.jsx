@@ -6,107 +6,22 @@ const rowsOf=(data)=>Array.isArray(data)?data.map(r=>Array.isArray(r)?r:(r&&type
 const cell=(v)=>v==null?'—':typeof v==='object'?JSON.stringify(v):String(v);
 
 function Orka3D({mood='idle',small=false,onClick,className=''}) {
- const mount=useRef(null);
- useEffect(()=>{
-  const host=mount.current;
-  if(!host)return;
-  let renderer,frame,observer,disposed=false;
-  import('three').then(THREE=>{
-   if(disposed)return;
-   const scene=new THREE.Scene();
-   const camera=new THREE.PerspectiveCamera(32,1,.1,100);
-   camera.position.set(0,0,5.35);
-   renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});
-   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-   renderer.setSize(host.clientWidth||240,host.clientHeight||220,false);
-   renderer.outputColorSpace=THREE.SRGBColorSpace;
-   renderer.toneMapping=THREE.ACESFilmicToneMapping;
-   renderer.toneMappingExposure=1.22;
-   host.appendChild(renderer.domElement);
-   scene.add(new THREE.HemisphereLight(0xf4f0ff,0x292044,2.25));
-   const key=new THREE.DirectionalLight(0xffffff,3.5);key.position.set(-3,4,5);scene.add(key);
-   const rim=new THREE.PointLight(0x65efff,17,8);rim.position.set(2,1,3);scene.add(rim);
-   const violet=new THREE.PointLight(0xa77aff,11,8);violet.position.set(-3,-1,2);scene.add(violet);
-   const root=new THREE.Group();scene.add(root);
-   const mat=(color,roughness=.24,metalness=.14,emissive=null,intensity=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness,emissive:emissive||color,emissiveIntensity:intensity});
-   const pearl=mat(0xf7f4ff,.2,.16), lavender=mat(0xaaa4d7,.28,.2), shadow=mat(0x34345e,.25,.24);
-   const black=mat(0x050916,.1,.34), cyan=mat(0x5cf4ff,.16,.12,0x20eaff,2.8), soft=mat(0xa8fbff,.18,.1,0x42eaff,1.5);
-   const sphere=new THREE.SphereGeometry(1,56,40);
-   const make=(geo,material,pos,scale,rot)=>{const m=new THREE.Mesh(geo,material);m.position.set(...pos);m.scale.set(...scale);if(rot)m.rotation.set(...rot);root.add(m);return m;};
-
-   // Compact, upright orca-bot silhouette inspired by the supplied mascot reference.
-   // A rounded pearl body gives the character its friendly, toy-like proportions.
-   const body=make(sphere,pearl,[0,-.22,0],[.88,1.02,.62]);
-   const lowerShell=make(sphere,lavender,[0,-.58,.28],[.72,.53,.38]);
-   // Dark orca side panels peek out from behind the white face shell.
-   make(sphere,shadow,[-.63,-.04,.20],[.27,.63,.37],[0,0,-.12]);
-   make(sphere,shadow,[.63,-.04,.20],[.27,.63,.37],[0,0,.12]);
-   // White upper head cowl, shaped as a smooth cap around the screen.
-   make(sphere,pearl,[0,.55,.08],[.91,.68,.60]);
-   // Oversized glossy face visor and luminous cyan rim.
-   const visorRim=make(sphere,soft,[0,.34,.53],[.79,.59,.19]);
-   make(sphere,black,[0,.34,.64],[.735,.535,.19]);
-   // Small white orca eye-patch details at the upper corners of the face.
-   make(sphere,pearl,[-.61,.70,.56],[.16,.20,.07],[0,0,-.25]);
-   make(sphere,pearl,[.61,.70,.56],[.16,.20,.07],[0,0,.25]);
-   const face=new THREE.Group();face.position.set(0,.34,.82);root.add(face);
-   const eyes=[];
-   [-1,1].forEach(side=>{
-    const eye=new THREE.Mesh(new THREE.SphereGeometry(.105,28,22),cyan);
-    eye.position.set(side*.265,.025,0);eye.scale.set(1.05,1.2,.55);face.add(eye);eyes.push(eye);
-    const glint=new THREE.Mesh(new THREE.SphereGeometry(.027,14,12),mat(0xffffff,.08,.02,0xffffff,.9));
-    glint.position.set(side*.265+.025,.06,.055);face.add(glint);
-   });
-   const smileCurve=new THREE.QuadraticBezierCurve3(new THREE.Vector3(-.12,-.15,.02),new THREE.Vector3(0,-.22,.045),new THREE.Vector3(.12,-.15,.02));
-   face.add(new THREE.Mesh(new THREE.TubeGeometry(smileCurve,20,.018,8,false),cyan));
-
-   // Whale dorsal fin rising behind the crown.
-   const dorsalShape=new THREE.Shape();
-   dorsalShape.moveTo(-.22,0);dorsalShape.quadraticCurveTo(-.18,.34,-.06,.57);
-   dorsalShape.quadraticCurveTo(.02,.68,.16,.51);dorsalShape.quadraticCurveTo(.25,.30,.28,0);dorsalShape.closePath();
-   const dorsal=new THREE.Mesh(new THREE.ExtrudeGeometry(dorsalShape,{depth:.18,bevelEnabled:true,bevelSegments:5,steps:1,bevelSize:.055,bevelThickness:.045}),shadow);
-   dorsal.position.set(-.17,1.04,-.38);root.add(dorsal);
-   const fins=[];
-   [-1,1].forEach(side=>{
-    const fin=make(sphere,pearl,[side*.78,-.54,.04],[.22,.48,.19],[0,0,side*-.35]);fins.push(fin);
-    make(sphere,lavender,[side*.76,-.24,-.02],[.19,.22,.18],[0,0,side*-.25]);
-   });
-   // Two small rear flukes are visible behind the lower body in three-quarter views.
-   const tail=new THREE.Group();tail.position.set(0,-.78,-.43);root.add(tail);
-   [-1,1].forEach(side=>{const l=new THREE.Mesh(sphere,shadow);l.scale.set(.33,.13,.12);l.position.set(side*.22,-.08,-.02);l.rotation.z=side*.38;tail.add(l);});
-
-   let tx=0,ty=0,lx=0,ly=0,lastBlink=0,blink=0;
-   const onPointer=e=>{const r=host.getBoundingClientRect();ty=((e.clientX-r.left)/r.width-.5)*.42;tx=-((e.clientY-r.top)/r.height-.5)*.3;};
-   const onLeave=()=>{tx=0;ty=0;};
-   host.addEventListener('pointermove',onPointer);host.addEventListener('pointerleave',onLeave);
-   const clock=new THREE.Clock();
-   const resize=()=>{if(!renderer)return;const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};
-   observer=new ResizeObserver(resize);observer.observe(host);resize();
-   const animate=()=>{
-    if(disposed)return;
-    frame=requestAnimationFrame(animate);
-    const t=clock.getElapsedTime(),thinking=mood==='think',listening=mood==='listen';
-    lx+=(tx-lx)*.06;ly+=(ty-ly)*.06;
-    root.rotation.y=lx+Math.sin(t*.42)*.035;
-    root.rotation.x=ly+(listening?-.025:0);
-    root.rotation.z=Math.sin(t*.55)*.012;
-    root.position.y=Math.sin(t*(thinking?2.2:.9))*(thinking?.045:.025);
-    fins[0].rotation.z=-.35+Math.sin(t*1.2)*.045;
-    fins[1].rotation.z=.35-Math.sin(t*1.2)*.045;
-    tail.rotation.y=Math.sin(t*1.35)*.18;
-    face.position.x=lx*.2;face.position.y=.34+ly*.14;
-    if(t-lastBlink>(thinking?1.9:3.4)+Math.sin(t*.3)*.7){lastBlink=t;blink=.001;}
-    if(blink>0){blink=Math.min(1,blink+.18);const sy=Math.max(.08,1-Math.sin(blink*Math.PI)*.94);eyes.forEach(e=>e.scale.y=sy*1.2);if(blink>=1)blink=0;}
-    else eyes.forEach(e=>e.scale.y=listening?1.32:1.2);
-    visorRim.material.emissiveIntensity=thinking?3.5:listening?2.9:1.6;
-    renderer.render(scene,camera);
-   };
-   animate();
-   host._cleanup=()=>{host.removeEventListener('pointermove',onPointer);host.removeEventListener('pointerleave',onLeave);observer?.disconnect();cancelAnimationFrame(frame);scene.traverse(o=>{o.geometry?.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});renderer?.dispose();renderer?.domElement.remove();};
-  }).catch(err=>console.error('Orka 3D avatar failed to load',err));
-  return()=>{disposed=true;host?._cleanup?.();};
- },[mood]);
- return <div ref={mount} className={'orka-scene '+(small?'orka-scene-small ':'')+className} role={onClick?'button':'img'} tabIndex={onClick?0:undefined} aria-label="Orka interactive 3D orca mascot" onClick={onClick} onKeyDown={e=>{if(onClick&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onClick();}}}/>;
+ const host=useRef(null);
+ const onPointerMove=e=>{
+  if(!host.current||small)return;
+  const r=host.current.getBoundingClientRect();
+  const x=(e.clientX-r.left)/r.width-.5;
+  const y=(e.clientY-r.top)/r.height-.5;
+  host.current.style.setProperty('--orka-tilt-x',(-y*9).toFixed(2)+'deg');
+  host.current.style.setProperty('--orka-tilt-y',(x*12).toFixed(2)+'deg');
+ };
+ const reset=()=>{if(host.current){host.current.style.setProperty('--orka-tilt-x','0deg');host.current.style.setProperty('--orka-tilt-y','0deg');}};
+ return <div ref={host} className={'orka-scene orka-image-scene '+(small?'orka-scene-small ':'')+(mood==='think'?'orka-image-think ':mood==='listen'?'orka-image-listen ':'')+className}
+   role={onClick?'button':'img'} tabIndex={onClick?0:undefined} aria-label="Orka interactive orca mascot"
+   onPointerMove={onPointerMove} onPointerLeave={reset}
+   onClick={onClick} onKeyDown={e=>{if(onClick&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onClick();}}}>
+   <img src="/images/orka-mascot.webp" alt="Orka.ai friendly 3D orca mascot" draggable="false"/>
+ </div>;
 }
 function Robot({mood='idle',small=false,onClick}) {return <Orka3D mood={mood} small={small} onClick={onClick}/>;}
 function OrcaWidget({thinking,listening,onOpenChat}) {
