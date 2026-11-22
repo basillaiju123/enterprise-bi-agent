@@ -971,3 +971,99 @@ body{overflow:hidden}
   background: transparent !important;
   border: 0 !important;
 }
+
+
+/* Make conversation workspace wider and improve readability */
+.conversation {
+  width: min(96%, 1240px) !important;
+  max-width: 1240px !important;
+  margin: 24px auto 0 !important;
+  border-radius: 16px;
+}
+
+.conversation-head {
+  min-height: 64px;
+  height: auto;
+  padding: 12px 22px;
+}
+
+.conversation-head b { font-size: 15px; }
+.conversation-head small { font-size: 12px; }
+.conversation-head>button { font-size: 12px; padding: 9px 13px; }
+
+.conversation-message {
+  padding: 22px 24px;
+}
+
+.conversation-question { gap: 12px; margin-bottom: 18px; }
+.conversation-question>span {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  font-size: 12px;
+}
+.conversation-question small { font-size: 10px; }
+.conversation-question p {
+  font-size: 15px;
+  line-height: 1.55;
+  margin-top: 6px;
+}
+
+.conversation-message .result-card {
+  margin-left: 46px;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.result-head { gap: 11px; }
+.bot-avatar { width: 36px; height: 36px; }
+.result-head b { font-size: 14px; }
+.result-head small { font-size: 10px; }
+.done { font-size: 11px; }
+
+.sql { margin: 16px 0; }
+.sql summary { padding: 12px 14px; font-size: 13px; }
+.sql pre, .approval pre {
+  padding: 14px 16px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.table-head { margin: 18px 0 11px; }
+.table-head b { font-size: 13px; }
+.table-head small { font-size: 11px; }
+.table-head button { font-size: 11px; padding: 8px 11px; }
+.table-scroll { max-height: 340px; }
+.conversation .table-scroll table { font-size: 12px; }
+.conversation .table-scroll td,
+.conversation .table-scroll th { padding: 11px 13px; }
+
+.result-meta {
+  gap: 18px;
+  padding-top: 13px;
+  margin-top: 14px;
+  font-size: 11px;
+}
+
+.conversation-thinking {
+  margin-left: 46px;
+  padding: 16px 18px;
+  gap: 14px;
+}
+.conversation-thinking b { font-size: 13px; }
+.conversation-thinking small { font-size: 11px; }
+
+.conversation-running { font-size: 12px; padding: 8px 18px; }
+.conversation .approval { margin: 16px 0 12px 46px; padding: 16px; }
+.conversation .approval b { font-size: 13px; }
+.conversation .approval small { font-size: 11px; }
+.conversation .approval footer button { font-size: 12px; padding: 9px 13px; }
+
+@media (max-width: 760px) {
+  .conversation { width: calc(100% - 20px) !important; }
+  .conversation-message { padding: 16px 13px; }
+  .conversation-message .result-card { margin-left: 0; padding: 14px; }
+  .conversation-thinking { margin-left: 0; }
+  .conversation .approval { margin-left: 0; }
+  .conversation-question p { font-size: 14px; }
+}
