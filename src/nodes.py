@@ -61,7 +61,7 @@ def _generate_with_rate_limit_retry(prompt: str):
         except RateLimitError as error:
             # A TPD (tokens-per-day) exhaustion cannot recover during this run.
             # Retrying only burns time and repeats the same rejected request.
-            if "tokens per day (TPD)" in str(error).lower():
+            if "tokens per day (tpd)" in str(error).lower():
                 raise
             if attempt >= MAX_RATE_LIMIT_RETRIES:
                 raise
