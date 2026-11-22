@@ -1445,3 +1445,22 @@ body{overflow:hidden}
   content: none !important;
   display: none !important;
 }
+
+
+/* One-time friendly greeting motion when the main page loads */
+.hero-mascot>.orka-welcome-greeting {
+  transform-origin: 50% 78%;
+  animation: orka-welcome-wave 1.9s ease-in-out 2;
+}
+@keyframes orka-welcome-wave {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  12% { transform: translateY(-7px) rotate(-5deg); }
+  25% { transform: translateY(-2px) rotate(5deg); }
+  38% { transform: translateY(-8px) rotate(-4deg); }
+  52% { transform: translateY(-2px) rotate(4deg); }
+  68% { transform: translateY(-5px) rotate(-2deg); }
+  82% { transform: translateY(0) rotate(1deg); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .hero-mascot>.orka-welcome-greeting { animation:none !important; }
+}
