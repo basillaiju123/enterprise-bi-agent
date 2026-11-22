@@ -22,7 +22,7 @@ function Robot({mood='idle',small=false,onClick}) {
  </div>;
 }
 
-function OrcaWidget({thinking,onOpenChat}) {
+function OrcaWidget({thinking,listening,onOpenChat}) {
  const [bubble,setBubble]=useState(false);
  const [tilt,setTilt]=useState({x:0,y:0});
  function track(e){
@@ -45,7 +45,7 @@ function OrcaWidget({thinking,onOpenChat}) {
 function Result({data,onCsv}){const rows=rowsOf(data.result);return <div className="result-card"><div className="result-head"><div className="bot-avatar"><Bot size={17}/></div><div><b>orka.ai</b><small>ANALYSIS COMPLETE</small></div><span className="done"><CheckCircle2 size={12}/> Returned</span></div>{data.error&&<p className="warn"><AlertTriangle size={14}/>{data.error}</p>}{data.sql&&<details open className="sql"><summary><span><Terminal size={14}/> Generated SQL</span><ChevronDown size={14}/></summary><pre>{data.sql}</pre></details>}<div className="table-head"><div><b><Table2 size={15}/> Query results</b><small>{rows.length} rows returned</small></div>{rows.length>0&&<button onClick={()=>onCsv(data)}><ArrowDownToLine size={13}/> CSV</button>}</div>{rows.length?<div className="table-scroll"><table><thead><tr>{rows[0].map((_,i)=><th key={i}>Column {i+1}</th>)}</tr></thead><tbody>{rows.slice(0,100).map((r,i)=><tr key={i}>{r.map((v,j)=><td key={j}>{cell(v)}</td>)}</tr>)}</tbody></table></div>:<div className="empty">No rows returned.</div>}<div className="result-meta"><span><CheckCircle2 size={12}/> Workflow finished</span><span>{data.retries||0} retries</span><span>{data.cache_hit?'Cache hit':'Fresh query'}</span></div></div>}
 
 export default function App(){
- const [q,setQ]=useState(''),[role,setRole]=useState('analyst'),[messages,setMessages]=useState([]),[busy,setBusy]=useState(false),[health,setHealth]=useState('checking'),[pending,setPending]=useState(null),[toast,setToast]=useState(''),[menu,setMenu]=useState(false);
+ const [q,setQ]=useState(''),[role,setRole]=useState('analyst'),[messages,setMessages]=useState([]),[busy,setBusy]=useState(false),[listening,setListening]=useState(false),[health,setHealth]=useState('checking'),[pending,setPending]=useState(null),[toast,setToast]=useState(''),[menu,setMenu]=useState(false);
  const input=useRef(null),bottom=useRef(null);
  useEffect(()=>{fetch(API+'/health').then(r=>{if(!r.ok)throw Error();setHealth('online')}).catch(()=>setHealth('offline'))},[]);
  useEffect(()=>{bottom.current&&bottom.current.scrollIntoView({behavior:'smooth'})},[messages,busy,pending]);
@@ -60,8 +60,8 @@ export default function App(){
   {menu&&<button className="hero-scrim" onClick={()=>setMenu(false)}/>}
   <main className="hero-main"><header className="hero-top"><button className="hamb" onClick={()=>setMenu(true)}><Menu/></button><span className="top-spacer"/><button aria-label="Notifications"><Bell/></button><button aria-label="Profile"><UserCircle/></button></header>
    <section className="hero-content">
-    <div className="hero-banner"><div className="hero-wave wave-one"/><div className="hero-wave wave-two"/><div className="hero-copy"><div className="hero-mascot"><Robot mood={busy?'think':'idle'} onClick={()=>input.current?.focus()}/></div><div className="hero-message"><h1>Hi Basil, I’m Orka<br/>Your Enterprise BI Assistant <span>👋</span></h1><p>Ask questions, analyze data, generate reports,<br/>or let me run end-to-end analytics for you.</p><div className="hero-api"><i className={'dot '+health}/>{health==='online'?'Connected and ready':health==='checking'?'Connecting to your API':'API connection unavailable'}</div></div></div>
-     <form className="hero-search" onSubmit={e=>{e.preventDefault();ask()}}><Sparkles/><input ref={input} value={q} onChange={e=>setQ(e.target.value)} placeholder="Ask orka.ai anything about your data..." disabled={busy||!!pending}/><button type="submit" disabled={!q.trim()||busy||!!pending}><Send/></button></form>
+    <div className="hero-banner"><div className="hero-wave wave-one"/><div className="hero-wave wave-two"/><div className="hero-copy"><div className="hero-mascot"><Robot mood={busy?'think':listening?'listen':'idle'} onClick={()=>input.current?.focus()}/></div><div className="hero-message"><h1>Hi Basil, I’m Orka<br/>Your Enterprise BI Assistant <span>👋</span></h1><p>Ask questions, analyze data, generate reports,<br/>or let me run end-to-end analytics for you.</p><div className="hero-api"><i className={'dot '+health}/>{health==='online'?'Connected and ready':health==='checking'?'Connecting to your API':'API connection unavailable'}</div></div></div>
+     <form className="hero-search" onSubmit={e=>{e.preventDefault();ask()}}><Sparkles/><input ref={input} value={q} onChange={e=>setQ(e.target.value)} onFocus={()=>setListening(true)} onBlur={()=>setListening(false)} placeholder="Ask orka.ai anything about your data..." disabled={busy||!!pending}/><button type="submit" disabled={!q.trim()||busy||!!pending}><Send/></button></form>
      <div className="hero-actions">{actions.map(a=><button key={a.label} onClick={()=>ask(a.question)}><span>{a.icon}</span>{a.label}</button>)}</div>
     </div>
     {messages.length>0&&<section className="conversation"><div className="conversation-head"><div><span className="conversation-icon"><MessageSquare/></span><div><b>Conversation</b><small>Your analytics workspace</small></div></div><button onClick={reset}><Plus size={14}/> New chat</button></div>{messages.map(m=><article className="conversation-message" key={m.id}><div className="conversation-question"><span>BL</span><div><small>YOU · {new Date(m.id).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small><p>{m.question}</p></div></div>{m.error?<div className="warn"><AlertTriangle/>{m.error}</div>:m.answer?<Result data={m.answer} onCsv={csv}/>:<div className="conversation-thinking"><Robot small mood="think"/><div><b>orka.ai is thinking...</b><small>Retrieving context · Generating SQL · Validating query</small><div className="bars"><i/><i/><i/></div></div></div>}</article>)}
@@ -70,7 +70,7 @@ export default function App(){
     <footer className="hero-footer"><span>© 2026 orka.ai</span><span><i className={'dot '+health}/> Secure, API-powered analytics</span></footer>
    </section>
   </main>
-  <OrcaWidget thinking={busy} onOpenChat={()=>input.current?.focus()}/>
+  <OrcaWidget thinking={busy} listening={listening} onOpenChat={()=>input.current?.focus()}/>
   {toast&&<div className="toast"><CheckCircle2 size={16}/>{toast}<button onClick={()=>setToast('')}><X size={14}/></button></div>}
  </div>;
 }
