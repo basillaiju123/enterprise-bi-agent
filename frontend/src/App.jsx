@@ -5,7 +5,7 @@ const SUGGESTIONS=['How many customers are from India?','Show the top 5 customer
 const rowsOf=(data)=>Array.isArray(data)?data.map(r=>Array.isArray(r)?r:(r&&typeof r==='object'?Object.values(r):[r])):[];
 const cell=(v)=>v==null?'—':typeof v==='object'?JSON.stringify(v):String(v);
 
-function Robot({mood='idle',small=false}){return <div className={'orka-avatar '+(small?'orka-avatar-small ':'')+'orka-avatar-'+mood} role="img" aria-label="Orka AI 3D virtual assistant"><img src="/images/orca-avatar.jpg" alt="Orka AI friendly 3D robot mascot" /></div>}
+function Robot({mood='idle',small=false}){return <div className={'orka-avatar '+(small?'orka-avatar-small ':'')+'orka-avatar-'+mood} role="img" aria-label="Orka AI 3D virtual assistant"><img src="/images/orca-avatar.png" alt="Orka AI friendly 3D robot mascot" /></div>}
 
 function OrcaWidget({thinking,onOpenChat}) {
  const [bubble,setBubble]=useState(false);
@@ -20,7 +20,7 @@ function OrcaWidget({thinking,onOpenChat}) {
   <div className="orca-bubble">{thinking?'Orka is thinking...':'Hi! Ask Orka anything.'}</div>
   <div className="orca-float">
    <button className="orca-tilt" type="button" aria-label="Open Orka AI chat" onMouseMove={track} onMouseLeave={()=>setTilt({x:0,y:0})} onClick={()=>{setBubble(v=>!v);onOpenChat?.();}} style={{transform:`rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`}}>
-    <img src="/images/orca-avatar.jpg" alt="Orka AI mascot" className="orca-img"/>
+    <img src="/images/orca-avatar.png" alt="Orka AI mascot" className="orca-img"/>
     <span className="orca-shadow"/>
    </button>
   </div>
