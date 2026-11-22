@@ -26,14 +26,35 @@ function Orka3D({mood='idle',small=false,onClick,className=''}) {
 function Robot({mood='idle',small=false,onClick,className=''}) {return <Orka3D mood={mood} small={small} onClick={onClick} className={className}/>;}
 function OrcaWidget({thinking,listening,resultReady,onOpenChat}) {
  const [bubble,setBubble]=useState(true);
+ const [position,setPosition]=useState(null);
+ const drag=useRef(null);
  useEffect(()=>{
   setBubble(true);
   const timer=setTimeout(()=>setBubble(false),5000);
   return ()=>clearTimeout(timer);
  },[thinking,listening,resultReady]);
- return <div className={'orca-widget '+(thinking?'thinking ':'')+(listening?'listening ':'')+(bubble?'show-bubble':'')}>
+ const onPointerDown=e=>{
+  if(e.button!==0)return;
+  const rect=e.currentTarget.getBoundingClientRect();
+  drag.current={pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,left:rect.left,top:rect.top,moved:false};
+  e.currentTarget.setPointerCapture(e.pointerId);
+ };
+ const onPointerMove=e=>{
+  if(!drag.current||drag.current.pointerId!==e.pointerId)return;
+  const dx=e.clientX-drag.current.startX,dy=e.clientY-drag.current.startY;
+  if(Math.abs(dx)+Math.abs(dy)>4)drag.current.moved=true;
+  if(drag.current.moved){
+   const width=84,height=84;
+   setPosition({left:Math.max(0,Math.min(window.innerWidth-width,drag.current.left+dx)),top:Math.max(0,Math.min(window.innerHeight-height,drag.current.top+dy))});
+  }
+ };
+ const onPointerUp=e=>{
+  if(drag.current?.pointerId===e.pointerId)drag.current=null;
+ };
+ const style=position?{left:position.left,top:position.top,right:'auto',bottom:'auto'}:undefined;
+ return <div className={'orca-widget '+(thinking?'thinking ':'')+(listening?'listening ':'')+(bubble?'show-bubble':'')} style={style}>
   <div className="orca-bubble">{thinking?'Thinking... analyzing your data':resultReady?'Here’s what I found!':listening?'I’m listening.':'Welcome back! How can I help you today?'}</div>
-  <div className="orca-float"><button className="orca-tilt" type="button" aria-label="Open Orka AI chat" onClick={()=>{setBubble(v=>!v);onOpenChat?.();}}><Orka3D mood={thinking?'think':listening?'listen':'idle'} small/><span className="orca-shadow"/></button></div>
+  <div className="orca-float"><button className="orca-tilt" type="button" aria-label="Drag Orka assistant or click to open chat" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onClick={()=>{if(drag.current?.moved)return;setBubble(v=>!v);onOpenChat?.();}}><Orka3D mood={thinking?'think':listening?'listen':'idle'} small/><span className="orca-shadow"/></button></div>
  </div>;
 }
 
