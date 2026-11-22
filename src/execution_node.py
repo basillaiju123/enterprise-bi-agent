@@ -47,13 +47,14 @@ def execute_sql_node(state: AgentState) -> AgentState:
     con = duckdb.connect(DB_PATH)
 
     try:
-        result = con.execute(sql).fetchall()
-
-       
+        cursor = con.execute(sql)
+        query_columns = [column[0] for column in cursor.description or []]
+        result = cursor.fetchall()
 
         return {
             **state,
             "query_result": result,
+            "query_columns": query_columns,
             "execution_error": "",
         }
 
