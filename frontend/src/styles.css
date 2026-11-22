@@ -299,3 +299,26 @@ body{overflow:hidden}
  .nexa-art-wrap{max-width:120px;max-height:118px}
  .nexa-art-small{max-width:70px;max-height:58px}
 }
+
+/* Original WALL-E-inspired CSS mascot: no external image dependency */
+.hero-brand-mark.walle-logo{position:relative;display:grid;place-items:center;overflow:hidden;background:linear-gradient(145deg,#f4c77d,#9a6338 70%,#543b2c);border:1px solid #f8d9a2;box-shadow:0 0 16px #a66cff66}
+.walle-logo-eyes{position:absolute;top:5px;display:flex;gap:3px}
+.walle-logo-eyes i{display:block;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff8d8 0 12%,#ffb64f 25%,#432b25 65%);border:1px solid #513b2a}
+.walle-logo-body{position:absolute;bottom:3px;width:19px;height:12px;border-radius:3px;background:#f3d6a0;color:#4d8a47;font-size:10px;text-align:center;line-height:12px}
+.walle-logo-tracks{position:absolute;bottom:1px;width:27px;height:4px;border-radius:5px;background:#3c3736}
+.nexa-art-wrap{width:100%;height:100%;max-width:210px;max-height:190px;display:flex;align-items:center;justify-content:center;margin:auto;animation:nexa-float 4s ease-in-out infinite}
+.walle-bot{position:relative;width:210px;height:190px;filter:drop-shadow(0 12px 17px #05040a88)}
+.walle-head{position:absolute;z-index:3;top:10px;left:50%;transform:translateX(-50%) rotate(-3deg);width:148px;height:67px;border:5px solid #8d6542;border-radius:36px 36px 29px 29px;background:linear-gradient(145deg,#ffe0a4,#b77c46 54%,#69452f);box-shadow:inset 0 3px 5px #fff5d4,0 4px 7px #07060b88;display:flex;align-items:center;justify-content:center;gap:12px}
+.walle-head:before{content:"";position:absolute;inset:6px;border-radius:30px;background:linear-gradient(120deg,#d6a16c,#241e22 40%,#15151f);z-index:-1}
+.walle-head i{width:43px;height:43px;border-radius:50%;background:radial-gradient(circle at 35% 28%,#fff8d4 0 5%,#ffcc70 13%,#bd6b25 29%,#2c2020 57%,#080b16 72%);border:4px solid #5a4438;box-shadow:0 0 9px #ffb65b,inset 0 0 7px #ffce85}
+.walle-neck{position:absolute;top:73px;left:50%;transform:translateX(-50%);width:24px;height:22px;background:linear-gradient(90deg,#57483d,#d6a16b,#4b3b31);border-radius:5px}
+.walle-body{position:absolute;z-index:2;top:91px;left:50%;transform:translateX(-50%);width:112px;height:70px;border:4px solid #815c3d;border-radius:13px 13px 9px 9px;background:linear-gradient(135deg,#f5d39a,#b77b43 65%,#755036);box-shadow:inset 0 4px 7px #fff2cf}
+.walle-body:before{content:"";position:absolute;inset:9px 17px 8px;border:2px solid #98714a;border-radius:5px;background:linear-gradient(145deg,#fff0c8,#d5b27b)}
+.walle-leaf{position:absolute;z-index:1;left:0;right:0;top:21px;text-align:center;color:#4c914b;font-size:22px}
+.walle-arm{position:absolute;z-index:1;top:111px;width:14px;height:42px;border-radius:9px;background:linear-gradient(90deg,#735039,#e3b77c,#8a5e3c);border:2px solid #694b36}
+.walle-arm.left{left:30px;transform:rotate(22deg)}.walle-arm.right{right:30px;transform:rotate(-22deg)}
+.walle-track{position:absolute;z-index:2;top:143px;width:58px;height:36px;border:5px solid #493c35;border-radius:12px;background:repeating-linear-gradient(90deg,#8c8173 0 5px,#423c38 5px 9px);box-shadow:inset 0 0 0 3px #9c8a70}
+.walle-track.left{left:19px;transform:rotate(-4deg)}.walle-track.right{right:19px;transform:rotate(4deg)}
+.nexa-art-small{max-width:68px;max-height:60px;animation:none}.nexa-art-small .walle-bot{transform:scale(.32);transform-origin:center;width:210px;height:190px;flex:none}
+.hero-brand-mark.walle-logo{flex:none}
+@keyframes nexa-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
