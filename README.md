@@ -156,6 +156,16 @@ The project evaluates generated SQL and final database results. Langfuse traces 
 
 A 30-query deterministic replay benchmark reported 30/30 cases passed. This replay result is not a guarantee of general LLM accuracy; an earlier fresh-generation run achieved 28/30 fully passed cases (93.3%).
 
+## Benchmarking
+
+The project includes a **500-case deterministic benchmark plan** across seven areas: SQL correctness and DuckDB execution (150), SQL guardrails (100), RBAC (75), RAG retrieval (50), workflow/HITL (50), semantic caching (50), and FastAPI endpoint reliability (25). The recorded runs passed all 500 planned cases.
+
+The benchmark is intended to validate deterministic application behavior, not to claim 100% fresh LLM accuracy or production reliability. Some components are mocked: RAG tests mock Qdrant/BM25, workflow tests isolate node/routing behavior, and API tests mock LangGraph invocation. The SQL correctness set contains 150 statements derived from 30 base query patterns with five LIMIT variants each.
+
+See **[the benchmark report](benchmarks/REPORT.md)** for methodology, results, limitations, and reproduction commands.
+
+**Reproducibility note:** the six pytest benchmark modules are committed under `tests/benchmark/`. The SQL correctness runner and its generated dataset/report were local artifacts and were not present on the `benchmark-500` branch when the report was prepared. Commit those files to make all 500 cases reproducible from a clean clone.
+
 ## API
 
 | Method | Endpoint | Purpose |
@@ -372,7 +382,7 @@ Run the backend test suite:
 python -m pytest -q tests
 ```
 
-The documented suite contains 14 tests covering SQL safety, multi-statement rejection, destructive SQL rejection, RBAC, FastAPI endpoints, invalid requests, zero-result queries, and the health endpoint.
+The original application test suite contains 14 tests covering SQL safety, RBAC, and FastAPI behavior. The additional deterministic benchmark modules are under `tests/benchmark/`; see [Benchmarking](benchmarks/REPORT.md) for category-level commands and the scope of each benchmark.
 
 GitHub Actions runs on pushes and pull requests. The documented workflow installs dependencies, runs tests, and builds the Docker image.
 
