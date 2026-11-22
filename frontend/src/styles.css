@@ -1067,3 +1067,87 @@ body{overflow:hidden}
   .conversation .approval { margin-left: 0; }
   .conversation-question p { font-size: 14px; }
 }
+
+
+/* Visually prioritize returned data so users spot the answer immediately */
+.conversation-message .table-head {
+  margin: 22px 0 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(115, 224, 190, .42);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(100deg, rgba(32, 126, 103, .30), rgba(105, 77, 177, .22));
+  box-shadow: inset 4px 0 0 #63dfb4;
+}
+
+.conversation-message .table-head b {
+  color: #a6f3d7;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .1px;
+}
+
+.conversation-message .table-head b svg {
+  width: 19px;
+  height: 19px;
+  color: #72e6bd;
+}
+
+.conversation-message .table-head small {
+  color: #c4c9dc;
+  font-size: 12px;
+}
+
+.conversation-message .table-head button {
+  border-color: rgba(111, 224, 186, .45);
+  background: rgba(34, 111, 91, .32);
+  color: #b5f5df;
+  font-size: 12px;
+  padding: 9px 13px;
+}
+
+.conversation-message .table-scroll {
+  border: 1px solid rgba(115, 224, 190, .42);
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  background: linear-gradient(135deg, rgba(24, 67, 61, .25), rgba(31, 29, 52, .8));
+  box-shadow: 0 10px 28px rgba(5, 12, 24, .18);
+}
+
+.conversation-message .table-scroll table {
+  font-size: 14px;
+}
+
+.conversation-message .table-scroll th {
+  padding: 13px 16px;
+  color: #b8f3df;
+  background: rgba(44, 104, 88, .38);
+  font-size: 12px;
+  border-bottom: 1px solid rgba(115, 224, 190, .22);
+}
+
+.conversation-message .table-scroll td {
+  padding: 16px;
+  color: #f3fff9;
+  font-size: 17px;
+  font-weight: 700;
+  background: rgba(37, 75, 67, .18);
+}
+
+.conversation-message .table-scroll tbody tr:hover td {
+  background: rgba(65, 153, 123, .22);
+}
+
+.conversation-message .empty {
+  border: 1px solid rgba(115, 224, 190, .35);
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  background: rgba(24, 67, 61, .18);
+  color: #d4e9e2;
+  font-size: 13px;
+  padding: 24px;
+}
+
+.conversation-message .result-meta {
+  margin-top: 14px;
+}
