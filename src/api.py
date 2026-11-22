@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from langgraph.types import Command
 
@@ -12,6 +13,16 @@ app = FastAPI(
     title="Enterprise BI Agent",
     description="Agentic Text-to-SQL and Business Analytics API",
     version="1.0.0",
+)
+
+# Allow the separately hosted portfolio frontend to call this API.
+# Restrict origins with FRONTEND_ORIGIN when deploying beyond a public demo.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
