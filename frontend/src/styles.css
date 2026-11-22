@@ -952,3 +952,22 @@ body{overflow:hidden}
 .hero-top {
   background: transparent !important;
 }
+
+
+/* Remove the separate top navigation strip; overlay controls on the hero background */
+.hero-main {
+  position: relative;
+}
+
+.hero-top {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 20;
+  flex: none !important;
+  height: 64px;
+  min-height: 64px;
+  background: transparent !important;
+  border: 0 !important;
+}
