@@ -96,6 +96,28 @@ The SQL correctness dataset and runner were generated and executed locally durin
 
 The six pytest modules above are committed and reproducible from the repository, subject to installing the project's test dependencies and preparing the expected local environment.
 
+## Separate live Groq evaluation
+
+A separate 50-question live evaluation harness is provided:
+
+- Dataset: `benchmarks/datasets/groq_eval_50.json`
+- Runner: `benchmarks/run_groq_eval.py`
+- Output: `benchmarks/results/groq_eval_50_report.json`
+
+Run it from the repository root after configuring `GROQ_API_KEY`, preparing the sample DuckDB database, and ensuring the local Qdrant knowledge collection is populated:
+
+```powershell
+python create_database.py
+python -m src.rag.ingest
+python benchmarks/run_groq_eval.py
+```
+
+The runner makes real Groq SQL-generation calls through the existing LangGraph application, uses the actual local RAG retrieval and DuckDB execution path, and calculates expected results by executing each dataset case's gold SQL. It disables the extra LLM judge and automatic graph retries so that a failed question does not silently trigger additional generation calls. It also bypasses semantic cache and HITL through the application's existing `evaluation_mode`.
+
+The runner records generated SQL, execution results, pass/fail status, attempted Groq generation calls, token usage when returned by the API, and latency. **The 50-case live evaluation has not yet been executed or verified.** Do not report a live Groq score until the runner completes successfully and its JSON report has been reviewed.
+
+The dataset is deliberately small and based on the repository's synthetic sample warehouse. It is a controlled integration check, not a broad estimate of enterprise text-to-SQL performance. The category labels describe question styles, not independently isolated model capabilities. The current harness does not test automatic self-correction because retries are disabled to enforce a predictable call budget; correction should be tested in a separately budgeted run.
+
 ## Evaluation boundaries
 
 This benchmark measures deterministic software behavior under controlled test conditions. It does **not** establish:
