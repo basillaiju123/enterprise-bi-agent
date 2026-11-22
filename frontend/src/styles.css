@@ -907,3 +907,26 @@ body{overflow:hidden}
 /* Larger, correctly framed hero mascot */
 .hero-mascot>.orka-scene{width:100%;height:100%;max-width:230px;max-height:230px;min-width:190px;min-height:190px}
 @media(max-width:760px){.hero-mascot>.orka-scene{max-width:180px;max-height:180px;min-width:150px;min-height:150px}}
+
+
+/* Orka mascot artwork: transparent source image with pointer-reactive depth */
+.orka-image-scene{perspective:900px;transform-style:preserve-3d;overflow:visible}
+.orka-image-scene img{
+ display:block;width:100%;height:100%;object-fit:contain;object-position:center;
+ transform:perspective(900px) rotateX(var(--orka-tilt-x,0deg)) rotateY(var(--orka-tilt-y,0deg)) translateZ(0);
+ transform-origin:50% 55%;transition:transform .18s cubic-bezier(.2,.75,.25,1),filter .3s ease;
+ filter:drop-shadow(0 17px 20px rgba(9,5,25,.34));
+ user-select:none;-webkit-user-drag:none;will-change:transform,filter;
+}
+.orka-image-scene[role="button"]:hover img{
+ filter:drop-shadow(0 18px 25px rgba(65,224,255,.24)) brightness(1.025);
+}
+.orka-image-think img{
+ filter:drop-shadow(0 0 17px rgba(58,232,255,.58)) drop-shadow(0 17px 20px rgba(9,5,25,.3));
+ animation:orka-image-thinking 1.8s ease-in-out infinite;
+}
+.orka-image-listen img{
+ filter:drop-shadow(0 0 14px rgba(58,232,255,.45)) drop-shadow(0 17px 20px rgba(9,5,25,.3));
+}
+@keyframes orka-image-thinking{0%,100%{transform:perspective(900px) rotateX(var(--orka-tilt-x,0deg)) rotateY(var(--orka-tilt-y,0deg)) scale(1)}50%{transform:perspective(900px) rotateX(var(--orka-tilt-x,0deg)) rotateY(var(--orka-tilt-y,0deg)) scale(1.025)}}
+@media(prefers-reduced-motion:reduce){.orka-image-scene img,.orka-image-think img{animation:none!important;transition:none!important}}
