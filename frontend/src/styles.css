@@ -67,3 +67,90 @@
 .welcome>.robot{
   margin:0 auto 1px;
 }
+
+
+/* Conversational Hero concept — recreate the first supplied reference */
+:root{--hero-purple:#8c55ff;--hero-glow:#a875ff}
+body{background:#10101f;color:#f8f7ff}
+.hero-shell{min-height:100vh;background:radial-gradient(ellipse at 55% 0%,#29204b 0%,#141426 44%,#10101d 100%);font-family:'DM Sans',sans-serif}
+.hero-sidebar{position:fixed;inset:0 auto 0 0;width:155px;background:linear-gradient(180deg,#151629,#111321);border-right:1px solid rgba(190,170,255,.14);padding:17px 12px 15px;display:flex;flex-direction:column;z-index:5}
+.hero-brand{display:flex;align-items:center;gap:8px;padding:0 9px 25px;color:#fff}
+.hero-brand-mark{width:25px;height:25px;border-radius:8px;background:linear-gradient(145deg,#fff,#b9a4ff);color:#32215e;display:grid;place-items:center;box-shadow:0 0 18px #9e76ff55}
+.hero-brand-mark svg{width:16px;height:16px}
+.hero-brand b{font:700 14px 'Space Grotesk';letter-spacing:-.3px}
+.hero-sidebar nav{display:grid;gap:4px}
+.hero-sidebar nav button{height:28px;border:0;background:transparent;border-radius:6px;padding:0 10px;display:flex;align-items:center;gap:9px;color:#e2def2;font-size:10px;text-align:left}
+.hero-sidebar nav button svg{width:13px;height:13px;stroke-width:1.8}
+.hero-sidebar nav button.selected{background:linear-gradient(100deg,#7444cb,#4e347f);color:white;box-shadow:0 4px 16px #6d43b744}
+.hero-sidebar nav button:hover{background:#30254d}
+.hero-profile{margin-top:auto;border-top:1px solid rgba(190,170,255,.13);padding:12px 7px 3px;display:flex;align-items:center;gap:8px;color:#fff;font-size:10px}
+.hero-profile span,.conversation-question>span{width:24px;height:24px;border-radius:50%;background:#e8e4ff;color:#302253;display:grid;place-items:center;font-size:9px;font-weight:700}
+.hero-main{margin-left:155px;min-height:100vh}
+.hero-top{height:43px;display:flex;align-items:center;gap:14px;padding:0 24px;color:#d7d1ed}
+.hero-top button{width:22px;height:22px;border:0;background:transparent;color:#e7e2f8;display:grid;place-items:center}
+.hero-top button svg{width:15px;height:15px}
+.hero-top .top-spacer{flex:1}
+.hero-content{width:min(100%,1120px);margin:0 auto;padding:8px 24px 18px}
+.hero-banner{position:relative;isolation:isolate;overflow:hidden;min-height:300px;border:1px solid #9b78e9;border-radius:17px;background:radial-gradient(ellipse at 37% 55%,#3b286d 0%,#211b3e 42%,#17172c 76%);box-shadow:0 12px 50px #07061066,inset 0 0 40px #9b70ff12;padding:28px 30px 18px}
+.hero-banner:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,#17152c88);z-index:-1}
+.hero-wave{position:absolute;left:-5%;right:-5%;height:130px;border:1px solid #9c6dff55;border-color:#9d69ff66 transparent transparent;border-radius:50%;transform:rotate(-7deg);filter:drop-shadow(0 0 9px #8d4eff88);z-index:-1;pointer-events:none}
+.wave-one{bottom:3px}
+.wave-two{bottom:25px;transform:rotate(7deg);opacity:.55}
+.hero-copy{display:flex;align-items:center;justify-content:center;gap:28px;min-height:150px;position:relative;z-index:1}
+.hero-mascot{width:185px;height:145px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hero-mascot>.robot{transform:scale(1.18);transform-origin:center center;margin:0}
+.hero-message{min-width:280px}
+.hero-message h1{font:700 clamp(22px,2.5vw,29px)/1.12 'Space Grotesk';letter-spacing:-.9px;margin:0 0 10px;color:#fff}
+.hero-message h1 span{font-size:.8em}
+.hero-message p{font-size:12px;line-height:1.55;color:#e1d9f5;margin:0}
+.hero-api{display:flex;align-items:center;gap:7px;font-size:9px;color:#c0b4e8;margin-top:12px}
+.hero-search{height:42px;width:min(76%,650px);margin:10px auto 17px;border:1px solid #d6c9ff;border-radius:30px;background:linear-gradient(100deg,#fff,#eee9ff);box-shadow:0 5px 20px #a87bff35,inset 0 1px 0 #fff;display:flex;align-items:center;gap:10px;padding:4px 5px 4px 18px;position:relative;z-index:2}
+.hero-search>svg{width:16px;height:16px;color:#8d4df4;flex-shrink:0}
+.hero-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#28213e;font:500 11px 'DM Sans'}
+.hero-search input::placeholder{color:#5c5571}
+.hero-search button{width:31px;height:31px;border:0;border-radius:50%;background:linear-gradient(145deg,#a66cff,#7445d8);color:#fff;display:grid;place-items:center;box-shadow:0 3px 10px #8051d866}
+.hero-search button svg{width:14px;height:14px}
+.hero-search button:disabled{opacity:.5}
+.hero-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;width:min(90%,680px);margin:0 auto;position:relative;z-index:2}
+.hero-actions button{height:43px;border:1px solid #7753b9;border-radius:11px;background:linear-gradient(145deg,#30224e,#211c37);box-shadow:0 5px 17px #09061155,inset 0 1px 0 #ffffff12;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-size:10px;font-weight:600;white-space:nowrap;transition:transform .18s,border-color .18s,background .18s}
+.hero-actions button:hover{transform:translateY(-2px);border-color:#b89aff;background:linear-gradient(145deg,#49316e,#2b2146)}
+.hero-actions button span{display:grid;place-items:center;color:#d4baff}
+.hero-actions button svg{width:17px;height:17px}
+.hero-footer{display:flex;justify-content:space-between;align-items:center;padding:13px 3px 0;color:#807b9b;font-size:9px}
+.hero-footer span:last-child{display:flex;align-items:center;gap:7px}
+.conversation{margin:18px auto 0;width:min(100%,900px);background:#17172a;border:1px solid #5d477e;border-radius:13px;overflow:hidden;box-shadow:0 10px 35px #07061044}
+.conversation-head{height:51px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff12}
+.conversation-head>div{display:flex;align-items:center;gap:9px}
+.conversation-icon{width:27px;height:27px;border-radius:8px;background:#39295b;color:#d1baff;display:grid;place-items:center}
+.conversation-icon svg{width:14px}
+.conversation-head b{font-size:11px;display:block}
+.conversation-head small{font-size:9px;color:#9991b4;display:block;margin-top:2px}
+.conversation-head>button{border:1px solid #70539c;background:#2a2141;color:#e5d9ff;border-radius:7px;padding:6px 9px;display:flex;align-items:center;gap:5px;font-size:9px}
+.conversation-message{padding:15px 17px;border-bottom:1px solid #ffffff0d}
+.conversation-question{display:flex;gap:9px;align-items:flex-start;margin-bottom:12px}
+.conversation-question>div{padding-top:1px}
+.conversation-question small{font-size:8px;color:#a49abf;letter-spacing:.6px}
+.conversation-question p{font-size:11px;margin:4px 0 0;color:#f3efff}
+.conversation-message .result-card{margin:0 0 0 33px;background:#201d32;border-color:#ffffff18}
+.conversation-thinking{display:flex;align-items:center;gap:9px;margin-left:32px;padding:10px 13px;border:1px solid #ffffff18;border-radius:9px;background:#211d35}
+.conversation-thinking>.robot{flex-shrink:0}
+.conversation-thinking b{display:block;font-size:10px}
+.conversation-thinking small{display:block;color:#aaa1c4;font-size:8px;margin-top:4px}
+.conversation-running{display:flex;align-items:center;gap:8px;padding:0 18px 13px;color:#c3aaff;font-size:9px}
+.conversation-running>i{width:7px;height:7px;border-radius:50%;background:#b08aff;animation:pulse 1s infinite}
+.conversation-running span{font-size:7px;letter-spacing:3px}
+.hero-shell .approval{margin:10px 17px 15px 50px}
+.hero-shell .warn{padding:0 12px}
+.hero-scrim{display:none}
+.hero-shell .toast{z-index:12}
+.hero-shell .robot .head{background:linear-gradient(145deg,#fff,#c6c8e8);box-shadow:inset -6px -6px 0 #a0a4d0,0 8px 20px #8d78d455}
+.hero-shell .robot .face{background:linear-gradient(145deg,#211a40,#100e25);box-shadow:inset 0 2px 7px #0008}
+.hero-shell .robot .eye{background:#b18aff;box-shadow:0 0 10px #a879ff}
+.hero-shell .robot .body{background:linear-gradient(140deg,#f4efff,#a99bd9);box-shadow:inset -5px -4px 0 #8777bd}
+.hero-shell .robot .body span{background:#32234e;color:#d7baff}
+.hero-shell .robot .antenna i{background:#b68aff;box-shadow:0 0 12px #b68aff}
+.hero-shell .robot .ear,.hero-shell .robot .arm{background:#b9b5e5}
+.hero-shell .robot .neck{background:#b9b5e5}
+@media(max-width:850px){.hero-sidebar{width:145px}.hero-main{margin-left:145px}.hero-content{padding:8px 16px}.hero-banner{padding:22px 18px 17px}.hero-copy{gap:13px}.hero-mascot{width:145px}.hero-actions{width:100%;gap:7px}.hero-actions button{font-size:9px;gap:5px}}
+@media(max-width:650px){.hero-sidebar{transform:translateX(-100%);transition:transform .2s}.hero-sidebar.open{transform:translateX(0)}.hero-sidebar .close-menu{display:grid}.hero-main{margin-left:0}.hero-top{height:42px;padding:0 14px}.hero-top .hamb{display:grid}.hero-scrim{display:block;position:fixed;inset:0;background:#0009;border:0;z-index:4}.hero-content{padding:8px 12px 15px}.hero-banner{min-height:0;padding:18px 13px 14px}.hero-copy{min-height:120px;gap:5px}.hero-mascot{width:105px;height:125px}.hero-mascot>.robot{transform:scale(.9)}.hero-message{min-width:0}.hero-message h1{font-size:19px}.hero-message p{font-size:9px}.hero-api{font-size:8px}.hero-search{width:96%;margin:7px auto 13px;height:39px}.hero-actions{grid-template-columns:repeat(2,minmax(0,1fr));width:96%}.hero-actions button{height:39px;font-size:9px}.hero-footer{font-size:8px}.conversation-message{padding:12px 10px}.conversation-message .result-card{margin-left:0}.hero-shell .approval{margin:10px}.conversation-thinking{margin-left:0}}
+@media(max-width:390px){.hero-copy{gap:0}.hero-mascot{width:88px}.hero-mascot>.robot{transform:scale(.78)}.hero-message h1{font-size:17px}.hero-message p br{display:none}.hero-actions button{font-size:8px}}
