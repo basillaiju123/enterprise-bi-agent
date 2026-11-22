@@ -272,8 +272,8 @@
     {
       "id": "G045",
       "category": "multi_condition_sql",
-      "question": "Show completed orders with the customer name and order date, sorted newest first.",
-      "gold_sql": "SELECT o.order_id, c.customer_name, o.order_date FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.status = 'Completed' ORDER BY o.order_date DESC, o.order_id;"
+      "question": "Which products have been ordered at least once? List each product name once.",
+      "gold_sql": "SELECT DISTINCT p.product_name FROM products p JOIN order_items oi ON p.product_id = oi.product_id ORDER BY p.product_name;"
     },
     {
       "id": "G046",
