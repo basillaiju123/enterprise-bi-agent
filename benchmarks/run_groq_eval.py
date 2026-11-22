@@ -7,6 +7,7 @@ disables the additional LLM judge and automatic retries to control cost.
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import sys
@@ -23,7 +24,7 @@ load_dotenv()
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-DATASET_PATH = ROOT / "benchmarks" / "datasets" / "groq_eval_50.json"
+DEFAULT_DATASET_PATH = ROOT / "benchmarks" / "datasets" / "groq_eval_100.json"
 DB_PATH = ROOT / "data" / "sample_warehouse.duckdb"
 RESULTS_DIR = ROOT / "benchmarks" / "results"
 MODEL_NAME = "openai/gpt-oss-20b"
@@ -41,22 +42,50 @@ def json_safe(value):
     return value
 
 
-def run_gold_query(sql: str):
+def run_query_with_columns(sql: str):
     with duckdb.connect(str(DB_PATH), read_only=True) as connection:
-        return connection.execute(sql).fetchall()
+        cursor = connection.execute(sql)
+        columns = [item[0] for item in cursor.description]
+        return columns, cursor.fetchall()
+
+
+def rows_match(expected, actual):
+    from src.result_evaluation_node import normalize_result
+    expected = normalize_result(expected)
+    actual = normalize_result(actual)
+    if expected == actual:
+        return True
+    return len(expected) == len(actual) and sorted(expected, key=str) == sorted(actual, key=str)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Run Orka.ai live Groq SQL evaluation.")
+    parser.add_argument("--dataset", default=str(DEFAULT_DATASET_PATH), help="Path to a JSON evaluation dataset.")
+    parser.add_argument("--run-id", default="run1", help="Run label for the output report filename.")
+    return parser.parse_args()
 
 
 def main():
+    args = parse_args()
+    dataset_path = Path(args.dataset).resolve()
     if not os.getenv("GROQ_API_KEY"):
         raise SystemExit("GROQ_API_KEY is missing. Add it to the project .env file.")
 
     if not DB_PATH.exists():
         raise SystemExit(f"Database not found: {DB_PATH}. Run python create_database.py first.")
 
-    dataset = json.loads(DATASET_PATH.read_text(encoding="utf-8"))
+    dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
     cases = dataset["cases"]
-    if len(cases) != 50:
-        raise SystemExit(f"Expected exactly 50 cases; found {len(cases)}.")
+    if not cases:
+        raise SystemExit("The evaluation dataset contains no cases.")
+    ids = [case.get("id") for case in cases]
+    if len(ids) != len(set(ids)):
+        raise SystemExit("Dataset contains duplicate case IDs.")
+    required = {"id", "category", "question", "gold_sql"}
+    for index, case in enumerate(cases, start=1):
+        missing = required - set(case)
+        if missing:
+            raise SystemExit(f"Case {index} is missing fields: {sorted(missing)}")
 
     # Import after loading environment variables. These are the actual app modules.
     from src import nodes, router, evaluation_node
@@ -94,7 +123,7 @@ def main():
         for case in cases:
             category_counts[case["category"]] += 1
             case_started = time.perf_counter()
-            expected = run_gold_query(case["gold_sql"])
+            expected_columns, expected = run_query_with_columns(case["gold_sql"])
 
             initial_state = {
                 "user_question": case["question"],
@@ -122,6 +151,7 @@ def main():
                 "category": case["category"],
                 "question": case["question"],
                 "expected_result": json_safe(expected),
+                "expected_columns": expected_columns,
             }
             calls_before = usage["calls"]
             rate_limit_retries_before = nodes.RATE_LIMIT_RETRY_COUNT
@@ -132,12 +162,19 @@ def main():
                     {"configurable": {"thread_id": thread_id}},
                 )
                 actual = final_state.get("query_result", [])
-                matched = results_match(expected, actual)
+                matched = rows_match(expected, actual)
+                try:
+                    actual_columns, _ = run_query_with_columns(final_state.get("generated_sql", ""))
+                except Exception:
+                    actual_columns = []
+                columns_match = expected_columns == actual_columns
                 record.update({
-                    "status": "passed" if matched and not final_state.get("execution_error") and not final_state.get("authorization_error") else "failed",
+                    "status": "passed" if matched and columns_match and not final_state.get("execution_error") and not final_state.get("authorization_error") else "failed",
                     "generated_sql": final_state.get("generated_sql", ""),
                     "actual_result": json_safe(actual),
                     "result_match": matched,
+                    "actual_columns": actual_columns,
+                    "columns_match": columns_match,
                     "validation_error": final_state.get("validation_error", ""),
                     "execution_error": final_state.get("execution_error", ""),
                     "authorization_error": final_state.get("authorization_error", ""),
@@ -159,7 +196,7 @@ def main():
             results.append(record)
 
             print(
-                f"[{len(results):02d}/50] {case['id']} "
+                f"[{len(results):02d}/{len(cases)}] {case['id']} "
                 f"{record['status'].upper()} "
                 f"calls={record['groq_generation_calls']} "
                 f"latency={record['latency_seconds']:.2f}s"
@@ -175,7 +212,8 @@ def main():
         "benchmark": "Orka.ai live Groq SQL evaluation",
         "run_at_utc": datetime.now(timezone.utc).isoformat(),
         "model": MODEL_NAME,
-        "dataset": str(DATASET_PATH.relative_to(ROOT)),
+        "dataset": str(dataset_path),
+        "run_id": args.run_id,
         "total_cases": len(cases),
         "passed": passed,
         "failed": failed,
@@ -205,14 +243,14 @@ def main():
             "The sample warehouse is small and synthetic; results do not establish general enterprise SQL accuracy.",
             "Gold SQL is executed against the same local DuckDB database to produce expected results.",
             "RAG retrieval uses the locally configured Qdrant collection and embedding model; its quality is not independently graded here.",
-            "This is a single fixed 50-question test set, not a statistical estimate of production performance.",
+            "This is a fixed synthetic-warehouse test set, not a statistical estimate of production performance.",
             "SQL correction retries are disabled; transient rate-limit retries may make multiple HTTP attempts for one case. Daily token quota exhaustion is detected and not retried.",
         ],
         "cases": results,
     }
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = RESULTS_DIR / "groq_eval_50_report.json"
+    output_path = RESULTS_DIR / f"groq_eval_100_{args.run_id}.json"
     output_path.write_text(json.dumps(report, indent=2, default=json_safe), encoding="utf-8")
 
     print("\n========== GROQ EVALUATION SUMMARY ==========")
