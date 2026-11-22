@@ -118,6 +118,32 @@ The runner records generated SQL, execution results, pass/fail status, attempted
 
 The dataset is deliberately small and based on the repository's synthetic sample warehouse. It is a controlled integration check, not a broad estimate of enterprise text-to-SQL performance. The category labels describe question styles, not independently isolated model capabilities. The current harness does not test automatic self-correction because retries are disabled to enforce a predictable call budget; correction should be tested in a separately budgeted run.
 
+## Expanded 100-question live Groq evaluation
+
+The expanded live dataset is available at `benchmarks/datasets/groq_eval_100.json`. It contains the original 50 cases plus 50 additional cases, with 100 unique IDs across six categories:
+
+| Category | Cases |
+|---|---:|
+| SQL generation | 20 |
+| Execution correctness | 15 |
+| RAG grounding | 15 |
+| Complex analytics | 20 |
+| Multi-condition SQL | 15 |
+| Edge cases | 15 |
+| **Total** | **100** |
+
+The runner accepts a dataset path and run label. From the repository root:
+
+```powershell
+python benchmarks/run_groq_eval.py --run-id run1
+python benchmarks/run_groq_eval.py --run-id run2
+python benchmarks/run_groq_eval.py --run-id run3
+```
+
+Reports are written separately to `benchmarks/results/groq_eval_100_run1.json`, `run2.json`, and `run3.json`. A different dataset can be supplied with `--dataset path/to/dataset.json`.
+
+The runner now checks generated result values and output column names against the gold query. The 100-case dataset has unique IDs and required fields. The benchmark remains a controlled test against the small synthetic warehouse. Gold SQL should be smoke-tested locally before spending live Groq quota; do not interpret API quota errors as incorrect model answers. The three runs are repeated evaluations on the same fixed questions, not three independent datasets.
+
 ## Evaluation boundaries
 
 This benchmark measures deterministic software behavior under controlled test conditions. It does **not** establish:
