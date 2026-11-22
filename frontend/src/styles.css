@@ -765,3 +765,51 @@ body{overflow:hidden}
 @media(max-width:760px){
  .hero-banner{padding:0 8px 14px}
 }
+
+
+/* Restore vertical scrolling for long conversations and smaller screens */
+html,body,#root{height:100%;min-height:0}
+body{overflow:hidden}
+.hero-shell{height:100dvh;min-height:0;overflow:hidden}
+.hero-main{
+ height:100dvh!important;
+ min-height:0!important;
+ display:flex;
+ flex-direction:column;
+ overflow:hidden;
+}
+.hero-top{flex:0 0 43px}
+.hero-content{
+ display:block!important;
+ flex:1 1 auto!important;
+ width:100%!important;
+ height:auto!important;
+ min-height:0!important;
+ margin:0!important;
+ padding:0 0 16px!important;
+ overflow-y:auto!important;
+ overflow-x:hidden!important;
+ overscroll-behavior:contain;
+ scrollbar-width:thin;
+ scrollbar-color:#7654a8 transparent;
+}
+.hero-content::-webkit-scrollbar{width:8px}
+.hero-content::-webkit-scrollbar-thumb{background:#7654a8;border-radius:8px}
+.hero-banner{
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ width:100%!important;
+ height:auto!important;
+ min-height:calc(100dvh - 43px)!important;
+ margin:0!important;
+ border-radius:0!important;
+ flex:none!important;
+}
+.conversation{flex:none;margin:18px auto 0}
+.hero-footer{padding:13px 24px 4px}
+@media(max-width:760px){
+ .hero-content{padding-bottom:12px!important}
+ .hero-banner{min-height:calc(100dvh - 43px)!important}
+ .conversation{width:calc(100% - 20px)}
+}
