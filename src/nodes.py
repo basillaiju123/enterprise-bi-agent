@@ -82,12 +82,12 @@ Validation error: {state["validation_error"]}
 Fix the reported issue. Preserve the requested output columns and meaning.
 """
 
-    # Keep instructions concise; retrieved RAG context supplies schema,
-    # relationships, and business definitions relevant to this question.
+    # Retrieved RAG context supplies the relevant schema, relationships,
+    # categorical values, and business definitions.
     prompt = f"""
 Generate one valid DuckDB SELECT query for the user's question.
 
-RETRIEVED DATABASE KNOWLEDGE:
+DATABASE KNOWLEDGE:
 {state["schema_context"]}
 
 QUESTION:
@@ -95,19 +95,47 @@ QUESTION:
 
 {feedback}
 
-RULES:
-- Output SQL only; no Markdown, explanation, or comments.
-- Use only tables, columns, values, and relationships supported by the retrieved knowledge.
-- Return exactly the requested fields. If a name is requested, select the name and join its table; do not substitute an ID.
-- For customer names, join customers through customer_id. For product names, join products through product_id.
-- Revenue means SUM(order_items.quantity * products.price), joining order_items to products and, when filtering by order status, joining orders by order_id. Never use quantity alone as revenue or invent a revenue column.
-- Average order value means completed-order revenue divided by COUNT(DISTINCT orders.order_id).
-- Order quantity means SUM(order_items.quantity); do not confuse it with revenue.
-- Count orders with COUNT(DISTINCT orders.order_id) when joins to order_items could multiply rows.
-- Apply every stated filter. Use stored categorical values from retrieved knowledge when available (for example, UK may be the stored value for United Kingdom).
-- Group only by the requested dimensions; do not add unrequested IDs to the output.
+SQL GENERATION RULES:
+
+1. SCHEMA GROUNDING
+- Use only tables, columns, values, and relationships explicitly supported by the database knowledge.
+- Use exact column names. Never guess conventional names such as "name" when the schema specifies "customer_name" or "product_name".
+- Use documented foreign-key relationships for joins.
+
+2. OUTPUT COLUMNS
+- Return exactly the fields requested by the user; do not add IDs or other unrequested columns.
+- When a customer name is requested, select customers.customer_name and join customers through customer_id.
+- When a product name is requested, select products.product_name and join products through product_id.
+- Never substitute an ID for a requested name.
+
+3. BUSINESS METRICS
+- Revenue = SUM(order_items.quantity * products.price).
+- Join order_items to products using product_id.
+- For order-specific revenue, join orders to order_items using order_id.
+- For customer-specific revenue, join customers to orders using customer_id, orders to order_items using order_id, and order_items to products using product_id.
+- When filtering revenue by order status, apply the status filter on orders.
+- Order quantity = SUM(order_items.quantity); do not confuse quantity with revenue.
+- Never invent a revenue column or use SUM(quantity) as revenue.
+- Average order value = completed-order revenue divided by COUNT(DISTINCT orders.order_id).
+
+4. AGGREGATION AND FILTERS
+- Apply every condition stated in the question.
+- Group only by the requested dimensions.
+- Use COUNT(DISTINCT orders.order_id) when joins to order_items could multiply order rows.
+- Use categorical values and aliases documented in the retrieved knowledge, such as UK for United Kingdom.
+
+5. DUCKDB DIALECT
+- Generate DuckDB-compatible SQL only; do not use syntax or functions specific to another SQL dialect.
+- For monthly grouping, use DATE_TRUNC('month', date_column).
+- Do not use unsupported functions such as TO_CHAR().
+- Use DuckDB-compatible date literals and date functions.
+
+6. SAFETY AND FORMAT
+- Output SQL only, without Markdown, explanations, or comments.
 - Use only SELECT or WITH ... SELECT. Never modify database data.
-- For correction attempts, fix the reported error without changing the question's intended result.
+- For correction attempts, fix the reported error while preserving the question's intended result.
+
+Return SQL only.
 """
 
     response = _generate_with_rate_limit_retry(prompt)
