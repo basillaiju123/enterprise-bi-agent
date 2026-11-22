@@ -54,3 +54,16 @@
 .mini-bot{display:none}
 .chat-body{min-height:320px;max-height:calc(100vh - 455px)}
 @media(max-width:820px){.chat-body{min-height:350px;max-height:none}}
+
+
+/* Medium mascot scale: keep Nexa present without dominating the dashboard */
+.welcome>.robot,
+.bot-card>.robot{
+  zoom:.82;
+}
+.bot-card>.robot{
+  margin:6px auto 0;
+}
+.welcome>.robot{
+  margin:0 auto 1px;
+}
