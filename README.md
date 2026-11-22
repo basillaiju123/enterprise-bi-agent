@@ -1,84 +1,108 @@
-Enterprise BI Agent
-Agentic Text-to-SQL Analytics Platform for enterprise-style business intelligence.
+# Orka.ai — Agentic Enterprise BI Assistant
 
-Enterprise BI Agent converts natural-language business questions into validated SQL and grounded analytical results. It combines LangGraph orchestration, hybrid RAG, LLM-based Text-to-SQL, SQLGlot AST guardrails, RBAC, human-in-the-loop approval, self-correction, semantic caching, evaluation, Langfuse observability, FastAPI, Docker, and GitHub Actions CI/CD.
-Live Demo
-- API: https://enterprise-bi-agent.onrender.com
-- Swagger UI: https://enterprise-bi-agent.onrender.com/docs
-- Health: https://enterprise-bi-agent.onrender.com/health
-Architecture
-User Question
-      |
-      v
-Semantic Cache
-      |
-      +---- cache hit --------------------+
-      |                                   |
-      +---- cache miss                    |
-               |                          |
-               v                          |
-        Hybrid RAG                        |
-     Qdrant + BM25 + RRF                  |
-               |                          |
-               +------------+-------------+
-                            v
-                    SQL Generation
-                    LangGraph + LLM
-                            |
-                            v
-                    SQLGlot Guardrails
-                            |
-                            v
-                         RBAC
-                            |
-                            v
-                     HITL Approval
-                            |
-                            v
-                    DuckDB Execution
-                            |
-                            v
-                  SQL + Result Evaluation
-                            |
-                    +-------+-------+
-                    |               |
-                  Success        Failure
-                    |               |
-                    v               v
-                  Cache       Self-Correction
-                                    |
-                                    v
-                                Retry SQL
-                                Max 3 retries
-Core Features
-- Natural-language Text-to-SQL
-- Hybrid semantic + BM25 retrieval with RRF
-- Schema and business-knowledge grounding
-- Stateful LangGraph workflow
-- SQLGlot AST-based read-only SQL guardrails
-- Role-based table authorization
-- Human-in-the-loop approval for selected risky queries
-- Automatic SQL self-correction with a maximum of 3 retries
-- Semantic SQL evaluation
-- Exact query-result evaluation
-- Semantic caching
-- Langfuse tracing
-- FastAPI REST API
-- DuckDB analytical warehouse
-- Reproducible Docker builds
-- GitHub Actions CI/CD
-- Public Docker deployment on Render
-How It Works
-1. Hybrid RAG
-Before SQL generation, the agent retrieves relevant schema, business definitions, and SQL examples.
-Retrieval combines:
-- Dense semantic retrieval
-- BM25 lexical retrieval
-- Reciprocal Rank Fusion (RRF)
-- Qdrant local vector storage
-The Docker build runs the RAG ingestion process itself, so the image does not depend on locally generated Qdrant files.
-2. Business Knowledge Grounding
-The knowledge base contains business definitions such as:
+An agentic Text-to-SQL analytics platform that lets users ask business questions in natural language and receive validated SQL and database-backed results.
+
+Orka.ai combines a React chat interface with a Python/FastAPI analytics backend. The backend uses LangGraph to orchestrate retrieval, SQL generation, validation, authorization, optional human approval, execution, evaluation, and correction.
+
+## Live Demo
+
+- **Frontend:** Vercel deployment — add the production URL from the Vercel project's **Domains** section.
+- **Backend API:** https://enterprise-bi-agent.onrender.com
+- **Swagger UI:** https://enterprise-bi-agent.onrender.com/docs
+- **Health check:** https://enterprise-bi-agent.onrender.com/health
+
+> The frontend is deployed separately from the backend. The Vercel production URL is intentionally not guessed here; replace this line with the exact `https://...` URL shown by Vercel.
+
+## Product Overview
+
+Users can ask questions such as:
+
+- How many customers are from India?
+- Show the top 5 customers by order count.
+- What is the average order value for completed orders?
+- Which products are available in the warehouse?
+
+The agent retrieves relevant schema and business context, generates SQL, validates it, checks table permissions, and executes approved queries against the DuckDB analytics warehouse. The UI displays the generated SQL, returned rows, execution metadata, and a CSV export option.
+
+## Application Interface
+
+The frontend is built with React and Vite and branded as **orka.ai**, with a custom orca mascot and a chat-oriented analytics workspace.
+
+Current interactive UI:
+- Chat input for natural-language analytics questions.
+- Quick-prompt actions for revenue analysis, SQL generation, workflow explanation, and insights.
+- API health indicator.
+- Generated SQL and query-result display.
+- CSV export for returned rows.
+- Human approval controls when the backend pauses a query.
+- New-chat reset and a floating Orka assistant mascot.
+
+The Agents, Workflows, Datasets, Reports, and Insights sidebar entries currently provide informational UI feedback; they are not separate fully implemented dashboard pages.
+
+## Architecture
+
+```text
+Browser
+  |
+  v
+React + Vite frontend (Vercel)
+  |
+  | HTTPS requests: /health, /query, /approve
+  v
+FastAPI backend (Render)
+  |
+  v
+LangGraph workflow
+  |
+  +--> Semantic cache (SQLite + embeddings)
+  |
+  +--> Hybrid RAG
+  |      +--> Dense semantic retrieval
+  |      +--> BM25 keyword retrieval
+  |      +--> Reciprocal Rank Fusion (RRF)
+  |      +--> Qdrant vector store
+  |
+  +--> LLM SQL generation (Groq GPT-OSS-20B)
+  |
+  +--> SQLGlot AST validation
+  |
+  +--> Role-based table authorization (RBAC)
+  |
+  +--> Human-in-the-loop approval, when required
+  |
+  +--> DuckDB query execution
+  |
+  +--> SQL/result evaluation
+          |
+          +--> Success: return result and cache eligible response
+          |
+          +--> Failure: self-correction and retry (up to 3 retries)
+  |
+  v
+Frontend renders SQL, result rows, status, and CSV export
+```
+
+## Backend Features
+
+### 1. Natural-language Text-to-SQL
+
+Converts a user's business question into SQL using the LLM and retrieved database/business context.
+
+### 2. Hybrid RAG
+
+Retrieves relevant schema details, business definitions, and SQL examples before SQL generation. Retrieval combines:
+- Dense semantic retrieval.
+- BM25 lexical retrieval.
+- Reciprocal Rank Fusion (RRF).
+- Qdrant local vector storage.
+
+The Docker build runs the RAG ingestion process so the image does not depend on locally generated Qdrant files.
+
+### 3. Business Knowledge Grounding
+
+The knowledge base includes business definitions such as:
+
+```text
 Revenue
 = SUM(order_items.quantity * products.price)
 
@@ -90,100 +114,71 @@ Cancelled Order
 
 Average Order Value
 = completed revenue / completed order count
-3. SQL Generation
-Example:
-Question:
-How many customers are from India?
-Generated SQL:
-SELECT COUNT(*) AS num_customers
-FROM customers
-WHERE country = 'India';
-4. SQLGlot Guardrails
-Generated SQL is parsed before execution.
-The system:
-- Allows only one SQL statement
-- Allows only SELECT queries
-- Rejects INSERT
-- Rejects UPDATE
-- Rejects DELETE
-- Rejects DROP
-- Rejects ALTER
-- Rejects CREATE
-5. RBAC
-Role	Allowed tables
-admin	all business tables
-analyst	all business tables
-viewer	customers, products
+```
 
+### 4. SQLGlot Guardrails
+
+Generated SQL is parsed before execution. The system allows a single read-only SELECT statement and rejects destructive or modifying statements such as INSERT, UPDATE, DELETE, DROP, ALTER, and CREATE.
+
+### 5. Role-Based Access Control
 
 Authorization is checked against the tables referenced by the parsed SQL.
-6. Human-in-the-Loop
-Selected non-aggregate queries can pause for explicit human approval.
-Query
-  |
-  v
-Risk check
-  |
-  v
-Approval required
-  |
-  +---- approve ---> execute
-  |
-  +---- reject ----> stop
-LangGraph persistence allows the workflow to resume using its thread ID.
-7. Self-Correction
-When validation, execution, or evaluation fails, the correction workflow feeds failure information back into SQL generation.
-The agent can retry up to 3 times using:
-- Previous SQL
-- Validation errors
-- Execution errors
-- Evaluation feedback
-Semantic Caching
-The system uses a semantic cache backed by SQLite and all-MiniLM-L6-v2.
-A local benchmark of five cold runs versus five cached runs produced:
-Metric	Result
-Cold median latency	1.726 s
-Cached median latency	0.831 s
-Median reduction	51.9%
 
+| Role | Allowed tables |
+|---|---|
+| admin | All business tables |
+| analyst | All business tables |
+| viewer | customers, products |
+
+### 6. Human-in-the-Loop Approval
+
+Selected non-aggregate queries can pause for explicit human approval. The user can approve and resume the workflow or reject it. LangGraph persistence uses a thread ID to resume the paused workflow.
+
+### 7. SQL Self-Correction
+
+When validation, execution, or evaluation fails, the correction workflow uses the previous SQL and failure feedback to attempt a correction. The workflow can retry up to three times.
+
+### 8. Semantic Caching
+
+A semantic cache backed by SQLite and all-MiniLM-L6-v2 can reuse results for sufficiently similar questions.
+
+A local benchmark of five cold runs versus five cached runs reported:
+
+| Metric | Result |
+|---|---:|
+| Cold median latency | 1.726 s |
+| Cached median latency | 0.831 s |
+| Median reduction | 51.9% |
 
 This is a local project benchmark, not a production SLA.
-Evaluation
-The project evaluates both generated SQL and final database results.
-30-query deterministic replay benchmark
-Metric	Result
-Execution accuracy	30/30
-Result validation	30/30
-Semantic evaluation	30/30
-Fully passed	30/30
-Replay accuracy	100%
 
+### 9. Evaluation and Observability
 
-The 100% result is for deterministic replay of recorded evaluation cases. An earlier fresh-generation run achieved 28/30 fully passed cases (93.3%). The replay figure should therefore not be interpreted as a general LLM accuracy guarantee.
+The project evaluates generated SQL and final database results. Langfuse traces major workflow stages, including retrieval, SQL generation, validation, execution, evaluation, and self-correction.
 
-Observability
-Langfuse traces major workflow stages:
-- Knowledge retrieval
-- SQL generation
-- SQL validation
-- SQL execution
-- SQL evaluation
-- Result evaluation
-- Self-correction
-API
-Method	Endpoint	Purpose
-GET	/	Service information
-GET	/health	Health check
-POST	/query	Run an analytics query
-POST	/approve	Resume human approval
+A 30-query deterministic replay benchmark reported 30/30 cases passed. This replay result is not a guarantee of general LLM accuracy; an earlier fresh-generation run achieved 28/30 fully passed cases (93.3%).
 
+## API
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/` | Service information |
+| GET | `/health` | Health check |
+| POST | `/query` | Run an analytics question |
+| POST | `/approve` | Resume a human-approval workflow |
 
 Example request:
+
+```json
 {
   "question": "How many customers are from India?",
   "role": "analyst"
 }
+```
+
 Example response:
+
+```json
 {
   "question": "How many customers are from India?",
   "sql": "SELECT COUNT(*) AS num_customers FROM customers WHERE country = 'India';",
@@ -194,30 +189,42 @@ Example response:
   "approval_required": false,
   "approval_status": "not_required"
 }
-Tech Stack
-Layer	Technology
-Language	Python 3.13
-LLM	Groq — GPT-OSS-20B
-Orchestration	LangGraph
-RAG	Qdrant + BM25 + RRF
-Embeddings	Sentence Transformers
-SQL validation	SQLGlot
-Database	DuckDB
-Cache	SQLite + Sentence Transformers
-API	FastAPI
-Observability	Langfuse
-Testing	Pytest
-Containerization	Docker
-CI/CD	GitHub Actions
-Deployment	Render
+```
 
+## Technology Stack
 
-Project Structure
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, Vite 6, JavaScript |
+| UI icons | Lucide React |
+| Backend language | Python 3.13 |
+| API | FastAPI |
+| LLM | Groq — GPT-OSS-20B |
+| Agent orchestration | LangGraph |
+| Retrieval | Qdrant, BM25, RRF |
+| Embeddings | Sentence Transformers |
+| SQL validation | SQLGlot |
+| Analytical database | DuckDB |
+| Semantic cache | SQLite + Sentence Transformers |
+| Observability | Langfuse |
+| Testing | Pytest |
+| Containerization | Docker |
+| CI/CD | GitHub Actions |
+| Frontend hosting | Vercel |
+| Backend hosting | Render |
+
+## Repository Structure
+
+```text
 enterprise-bi-agent/
-├── .github/workflows/tests.yml
-├── data/
-│   ├── sample_warehouse.duckdb
-│   └── evaluation_replay.json
+├── .github/workflows/       # GitHub Actions CI workflow
+├── data/                    # Sample warehouse and evaluation replay data
+├── frontend/
+│   ├── public/images/       # Orka mascot assets
+│   ├── src/                 # React application and styles
+│   ├── index.html
+│   ├── package.json
+│   └── package-lock.json
 ├── src/
 │   ├── api.py
 │   ├── graph.py
@@ -237,112 +244,152 @@ enterprise-bi-agent/
 │   ├── guardrails/
 │   └── security/
 ├── tests/
-│   ├── test_api.py
-│   ├── test_guardrails.py
-│   └── test_rbac.py
 ├── Dockerfile
 ├── requirements.txt
 ├── create_database.py
-├── README.md
-└── .gitignore
-Local Setup
+└── README.md
+```
+
+## Local Development
+
+### Backend
+
+1. Clone the repository and enter the project directory:
+
+```bash
 git clone https://github.com/basillaiju123/enterprise-bi-agent.git
 cd enterprise-bi-agent
+```
+
+2. Create and activate a virtual environment:
+
+```bash
 python -m venv .venv
+```
+
 Windows PowerShell:
+
+```powershell
 .venv\Scripts\Activate.ps1
+```
+
+3. Install dependencies:
+
+```bash
 pip install -r requirements.txt
-Create .env:
-GROQ_API_KEY=your_groq_key
+```
+
+4. Create a root-level `.env` file with your own credentials:
+
+```dotenv
+GROQ_API_KEY=your_groq_api_key
 LANGFUSE_PUBLIC_KEY=your_langfuse_public_key
 LANGFUSE_SECRET_KEY=your_langfuse_secret_key
 LANGFUSE_HOST=https://cloud.langfuse.com
-Run:
+```
+
+5. Start the API:
+
+```bash
 uvicorn src.api:app --host 0.0.0.0 --port 8000
-Swagger:
-http://localhost:8000/docs
-Docker
-Build:
+```
+
+Backend docs: http://localhost:8000/docs
+
+### Frontend
+
+Open a second terminal:
+
+```bash
+cd frontend
+npm install
+```
+
+Create `frontend/.env.local`:
+
+```dotenv
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+Start the Vite development server:
+
+```bash
+npm run dev
+```
+
+Vite prints the local frontend URL in the terminal (normally http://localhost:5173).
+
+The frontend defaults to the deployed Render API if `VITE_API_BASE_URL` is not set. Use the local value above when running the backend locally.
+
+## Deployment
+
+### Frontend — Vercel
+
+The frontend is a Vite application in the `frontend/` directory.
+
+1. Import `basillaiju123/enterprise-bi-agent` into Vercel.
+2. Set the project Root Directory to `frontend`.
+3. Select the Vite framework preset.
+4. Use `npm run build` as the build command and `dist` as the output directory.
+5. Configure `VITE_API_BASE_URL` as `https://enterprise-bi-agent.onrender.com` for Production (and Preview if required).
+6. Deploy and use the production domain shown in the Vercel project dashboard.
+
+Vite environment variables prefixed with `VITE_` are included in the client bundle. Do not put private API keys or secrets in frontend environment variables.
+
+### Backend — Render
+
+The backend is deployed as a Docker Web Service on Render:
+
+- API: https://enterprise-bi-agent.onrender.com
+- Health: https://enterprise-bi-agent.onrender.com/health
+- Swagger: https://enterprise-bi-agent.onrender.com/docs
+
+Backend secrets are supplied through deployment environment variables and should not be committed to Git.
+
+### Automatic deployments
+
+The repository is connected to GitHub. Vercel can create deployments from Git commits, while the backend deployment is managed separately on Render. Verify both deployments after changing API or frontend code.
+
+## Docker
+
+Build the backend image:
+
+```bash
 docker build -t enterprise-bi-agent .
-Run:
+```
+
+Run it:
+
+```bash
 docker run --rm --env-file .env -e PORT=8000 -p 8000:8000 enterprise-bi-agent
-The Docker build automatically runs RAG ingestion and creates the enterprise_knowledge Qdrant collection inside the image.
-Testing
-Run:
+```
+
+The Docker build automatically runs RAG ingestion and creates the `enterprise_knowledge` Qdrant collection inside the image.
+
+## Testing
+
+Run the backend test suite:
+
+```bash
 python -m pytest -q tests
-Current suite:
-14 passed
-Coverage includes SQL safety, multi-statement rejection, destructive SQL rejection, RBAC, FastAPI endpoints, invalid requests, zero-result queries, and the health endpoint.
-CI/CD
-GitHub Actions runs on pushes and pull requests:
-Git Push / Pull Request
-        |
-        v
-Python 3.13
-        |
-        v
-Install dependencies
-        |
-        v
-Run 14 tests
-        |
-        v
-Build Docker image
-        |
-        v
-PASS / FAIL
-The Docker build also validates reproducible RAG ingestion.
-Deployment
-The application is deployed as a Docker Web Service on Render.
-https://enterprise-bi-agent.onrender.com
-Health:
-https://enterprise-bi-agent.onrender.com/health
-Swagger:
-https://enterprise-bi-agent.onrender.com/docs
-Secrets are supplied through deployment environment variables and are not stored in the repository.
-Engineering Highlights
-This project demonstrates production-oriented GenAI engineering patterns:
-- Agent orchestration: LangGraph models the workflow as explicit state and transitions.
-- Grounding: Hybrid retrieval supplies schema and business context before generation.
-- Guardrails: SQLGlot enforces a read-only SQL boundary.
-- Authorization: RBAC restricts table access by role.
-- Human oversight: HITL approval can pause and resume execution.
-- Reliability: Self-correction and result evaluation handle incorrect SQL.
-- Performance: Semantic caching reduced local median latency by 51.9%.
-- Evaluation: A reproducible 30-query benchmark supports regression testing.
-- Deployment: Docker + GitHub Actions + Render provide a complete delivery path.
-Security Considerations
-The current implementation provides:
-- Read-only SQL enforcement
-- AST-level SQL validation
-- Table-level RBAC
-- Human approval for selected risky queries
-- Environment-based secret management
-A larger enterprise deployment would additionally require authentication, stronger prompt-injection defenses, query timeouts, query cost limits, result-size limits, sensitive-column controls, database-level permissions, rate limiting, audit logging, and production secret rotation.
-Project Status
-Completed
-- [x] Natural-language Text-to-SQL
-- [x] Schema retrieval
-- [x] Business knowledge retrieval
-- [x] Hybrid semantic + BM25 retrieval
-- [x] LangGraph orchestration
-- [x] SQLGlot guardrails
-- [x] RBAC
-- [x] DuckDB execution
-- [x] Self-correction
-- [x] Human-in-the-loop approval
-- [x] Semantic SQL evaluation
-- [x] Exact result evaluation
-- [x] Semantic caching
-- [x] Langfuse observability
-- [x] FastAPI API
-- [x] Docker
-- [x] Reproducible Qdrant ingestion
-- [x] Pytest suite
-- [x] GitHub Actions CI/CD
-- [x] Public deployment
-Portfolio Summary
-Enterprise BI Agent demonstrates how LLMs can be combined with retrieval, structured validation, authorization, human oversight, evaluation, caching, observability, and deployment to build a more reliable Text-to-SQL analytics system.
-The focus is engineering reliability around LLMs, rather than treating the LLM as the entire application.
-License
+```
+
+The documented suite contains 14 tests covering SQL safety, multi-statement rejection, destructive SQL rejection, RBAC, FastAPI endpoints, invalid requests, zero-result queries, and the health endpoint.
+
+GitHub Actions runs on pushes and pull requests. The documented workflow installs dependencies, runs tests, and builds the Docker image.
+
+## Security Notes and Limitations
+
+Current protections include:
+- Read-only SQL enforcement through SQL parsing and validation.
+- Table-level RBAC.
+- Human approval for selected risky queries.
+- Environment-based secret configuration.
+
+This is a portfolio and learning project, not a certified production security platform. A larger deployment should additionally consider authentication, stronger prompt-injection defenses, query timeouts and cost limits, result-size limits, sensitive-column controls, database-level permissions, rate limiting, audit logging, and secret rotation.
+
+The current frontend is a chat-focused interface. Sidebar items for Agents, Workflows, Datasets, Reports, and Insights are informational UI actions rather than separate fully implemented pages.
+
+## License
+
 This project is intended as a portfolio and learning project demonstrating an agentic AI system for enterprise analytics.
