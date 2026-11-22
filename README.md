@@ -164,6 +164,8 @@ The benchmark is intended to validate deterministic application behavior, not to
 
 See **[the benchmark report](benchmarks/REPORT.md)** for methodology, results, limitations, and reproduction commands.
 
+A separate 50-question **live Groq evaluation** harness is also provided at `benchmarks/run_groq_eval.py`, using `benchmarks/datasets/groq_eval_50.json`. It calls the real LangGraph generation path and records SQL execution accuracy, token usage, and latency. Run it only after preparing the local DuckDB database and Qdrant knowledge collection; see the report for commands. Its live score is pending execution and is separate from the deterministic 500-case suite.
+
 **Reproducibility note:** the six pytest benchmark modules are committed under `tests/benchmark/`. The SQL correctness runner and its generated dataset/report were local artifacts and were not present on the `benchmark-500` branch when the report was prepared. Commit those files to make all 500 cases reproducible from a clean clone.
 
 ## API
