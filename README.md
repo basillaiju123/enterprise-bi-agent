@@ -6,12 +6,10 @@ Orka.ai combines a React chat interface with a Python/FastAPI analytics backend.
 
 ## Live Demo
 
-- **Frontend:** Vercel deployment — add the production URL from the Vercel project's **Domains** section.
+- **Live website:** https://enterprise-bi-agent.vercel.app/
 - **Backend API:** https://enterprise-bi-agent.onrender.com
 - **Swagger UI:** https://enterprise-bi-agent.onrender.com/docs
 - **Health check:** https://enterprise-bi-agent.onrender.com/health
-
-> The frontend is deployed separately from the backend. The Vercel production URL is intentionally not guessed here; replace this line with the exact `https://...` URL shown by Vercel.
 
 ## Product Overview
 
