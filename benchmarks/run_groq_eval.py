@@ -163,10 +163,9 @@ def main():
                 )
                 actual = final_state.get("query_result", [])
                 matched = rows_match(expected, actual)
-                try:
-                    actual_columns, _ = run_query_with_columns(final_state.get("generated_sql", ""))
-                except Exception:
-                    actual_columns = []
+                # Read column names captured by the application's authorized execution.
+                # Never execute generated SQL a second time from the benchmark runner.
+                actual_columns = final_state.get("query_columns", [])
                 columns_match = expected_columns == actual_columns
                 record.update({
                     "status": "passed" if matched and columns_match and not final_state.get("execution_error") and not final_state.get("authorization_error") else "failed",
