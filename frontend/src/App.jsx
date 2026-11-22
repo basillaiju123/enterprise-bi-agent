@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState} from 'react';
+import React, {useEffect,useRef,useState} from 'react';
 import {Activity,ArrowDownToLine,Check,CheckCircle2,ChevronDown,Code2,Database,History,LayoutDashboard,LockKeyhole,Menu,MessageSquare,Plus,Send,ShieldCheck,Sparkles,Table2,Terminal,Workflow,X,AlertTriangle,RefreshCw,Bot} from 'lucide-react';
 
 const API=(import.meta.env.VITE_API_BASE_URL||'https://enterprise-bi-agent.onrender.com').replace(/\/$/,'');
