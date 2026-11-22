@@ -1,6 +1,6 @@
 import React,{useEffect,useRef,useState} from 'react';
 import {Activity,ArrowDownToLine,Check,CheckCircle2,ChevronDown,Code2,Database,History,Home,LayoutDashboard,LockKeyhole,Menu,MessageSquare,Plus,Send,ShieldCheck,Sparkles,Table2,Terminal,Workflow,X,AlertTriangle,RefreshCw,Bot,Bell,UserCircle,BarChart3,FileText,Network,Clock3} from 'lucide-react';
-
+const API=(import.meta.env.VITE_API_BASE_URL||'https://enterprise-bi-agent.onrender.com').replace(/\/$/,'');
 const API=(import.meta.env.VITE_API_BASE_URL||'https://enterprise-bi-agent.onrender.com').replace(/\\/$/,'');
 const SUGGESTIONS=['How many customers are from India?','Show the top 5 customers by order count','What is the average order value for completed orders?','Which products are available in the warehouse?'];
 const rowsOf=(data)=>Array.isArray(data)?data.map(r=>Array.isArray(r)?r:(r&&typeof r==='object'?Object.values(r):[r])):[];
