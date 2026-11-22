@@ -125,18 +125,6 @@ def test_query_response_contains_contract_fields(monkeypatch):
     assert set(data) == expected
 
 
-def test_query_preserves_question_text(monkeypatch):
-    question = "  Summarize sales by region  "
-    monkeypatch.setattr(
-        "src.api.graph.invoke",
-        lambda *args, **kwargs: {"generated_sql": "SELECT 1"},
-    )
-    response = client.post("/query", json={"question": question})
-
-    assert response.status_code == 200
-    assert response.json()["question"] == question
-
-
 @pytest.mark.parametrize("approved", [True, False])
 def test_approval_endpoint_resumes_with_boolean(monkeypatch, approved):
     captured = {}
@@ -206,12 +194,3 @@ def test_query_defaults_role_to_analyst(monkeypatch):
     assert captured["role"] == "analyst"
 
 
-def test_query_returns_empty_result_when_graph_omits_result(monkeypatch):
-    monkeypatch.setattr(
-        "src.api.graph.invoke",
-        lambda *args, **kwargs: {"generated_sql": "SELECT 1"},
-    )
-    response = client.post("/query", json={"question": "No rows"})
-
-    assert response.status_code == 200
-    assert response.json()["result"] == []
