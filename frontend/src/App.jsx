@@ -10,56 +10,79 @@ function Orka3D({mood='idle',small=false,onClick,className=''}) {
  useEffect(()=>{
   const host=mount.current;
   if(!host)return;
-  let renderer,frame,observer;
+  let renderer,frame,observer,cleanup;
   let disposed=false;
   import('three').then(THREE=>{
    if(disposed)return;
    const scene=new THREE.Scene();
    const camera=new THREE.PerspectiveCamera(34,1,.1,100);
-   camera.position.set(0,0,6.2);
+   camera.position.set(0,0,6.4);
    renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});
    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
    renderer.setSize(host.clientWidth||240,host.clientHeight||220,false);
    renderer.outputColorSpace=THREE.SRGBColorSpace;
    renderer.toneMapping=THREE.ACESFilmicToneMapping;
-   renderer.toneMappingExposure=1.25;
+   renderer.toneMappingExposure=1.2;
    host.appendChild(renderer.domElement);
-   scene.add(new THREE.HemisphereLight(0xe9e7ff,0x29204b,2.0));
-   const key=new THREE.DirectionalLight(0xffffff,3.2);key.position.set(-3,4,5);scene.add(key);
-   const rimLight=new THREE.PointLight(0x65efff,16,8);rimLight.position.set(2,1,3);scene.add(rimLight);
-   const violet=new THREE.PointLight(0x9b61ff,18,9);violet.position.set(-3,-1,2);scene.add(violet);
+   scene.add(new THREE.HemisphereLight(0xf2f0ff,0x17152f,2.1));
+   const key=new THREE.DirectionalLight(0xffffff,3.4);key.position.set(-3,4,5);scene.add(key);
+   const rim=new THREE.PointLight(0x61efff,15,9);rim.position.set(2,1,3);scene.add(rim);
+   const violet=new THREE.PointLight(0x9b61ff,13,9);violet.position.set(-3,-1,2);scene.add(violet);
    const root=new THREE.Group();scene.add(root);
-   const mat=(color,roughness=.28,metalness=.12,emissive=null,intensity=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness,emissive:emissive||color,emissiveIntensity:intensity});
-   const pearl=mat(0xf4f1ff,.22,.18);
-   const lavender=mat(0xaaa4dc,.3,.22);
-   const dark=mat(0x080d20,.12,.35);
-   const cyan=mat(0x59f4ff,.18,.12,0x18dfff,2.4);
-   const softCyan=mat(0x9afaff,.2,.1,0x38eaff,1.5);
-   const body=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),pearl);body.scale.set(.78,.98,.58);body.position.y=-.38;root.add(body);
-   const chest=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),lavender);chest.scale.set(.58,.56,.16);chest.position.set(0,-.5,.48);root.add(chest);
-   const head=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),pearl);head.scale.set(1.02,.86,.72);head.position.set(0,.55,0);root.add(head);
-   const crown=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),lavender);crown.scale.set(.28,.65,.25);crown.position.set(0,1.24,-.12);crown.rotation.z=-.12;root.add(crown);
-   const visorRim=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),softCyan);visorRim.scale.set(.87,.58,.18);visorRim.position.set(0,.48,.63);root.add(visorRim);
-   const visor=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),dark);visor.scale.set(.82,.53,.19);visor.position.set(0,.49,.69);root.add(visor);
-   const eyeGroup=new THREE.Group();eyeGroup.position.set(0,.48,.87);root.add(eyeGroup);
+   const material=(color,roughness=.25,metalness=.12,emissive=null,intensity=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness,emissive:emissive||color,emissiveIntensity:intensity});
+   const midnight=material(0x171b35,.24,.22);
+   const black=material(0x070b18,.12,.3);
+   const white=material(0xf5f3ff,.22,.16);
+   const pale=material(0xd8d7f4,.28,.18);
+   const cyan=material(0x63f4ff,.16,.12,0x16dfff,2.5);
+   const glow=material(0xa5fbff,.18,.1,0x42eaff,1.5);
+   const sphere=new THREE.SphereGeometry(1,48,32);
+   const make=(geo,mat,pos,scale,rot)=>{const m=new THREE.Mesh(geo,mat);m.position.set(...pos);m.scale.set(...scale);if(rot)m.rotation.set(...rot);root.add(m);return m;};
+
+   // A whale-shaped silhouette: broad streamlined body, dorsal fin, flippers and tail flukes.
+   const body=make(sphere,midnight,[0,-.12,0],[1.42,.68,.62]);
+   const belly=make(sphere,white,[.02,-.43,.31],[1.13,.36,.39]);
+   const muzzle=make(sphere,midnight,[.78,-.02,.26],[.55,.43,.48]);
+   // White eye patches on the characteristic black-and-white orca head.
+   make(sphere,white,[.57,.38,.43],[.3,.23,.12],[0,0,-.22]);
+   make(sphere,white,[-.57,.38,.43],[.3,.23,.12],[0,0,.22]);
+   // Glossy face screen sits forward on the whale's head.
+   const visorRim=make(sphere,glow,[0,.22,.59],[.67,.43,.17]);
+   const visor=make(sphere,black,[0,.22,.70],[.625,.385,.15]);
+   const eyeGroup=new THREE.Group();eyeGroup.position.set(0,.24,.84);root.add(eyeGroup);
    const eyes=[];
    [-1,1].forEach(side=>{
-    const eye=new THREE.Mesh(new THREE.SphereGeometry(.105,24,20),cyan);eye.position.set(side*.29,.015,0);eye.scale.set(1.05,1.22,.55);eyeGroup.add(eye);eyes.push(eye);
-    const glint=new THREE.Mesh(new THREE.SphereGeometry(.028,12,10),mat(0xffffff,.1,.05,0xffffff,.8));glint.position.set(side*.29+.025,.055,.055);eyeGroup.add(glint);
+    const eye=new THREE.Mesh(new THREE.SphereGeometry(.105,24,20),cyan);
+    eye.position.set(side*.22,.025,0);eye.scale.set(1.05,1.2,.55);eyeGroup.add(eye);eyes.push(eye);
+    const glint=new THREE.Mesh(new THREE.SphereGeometry(.026,12,10),material(0xffffff,.08,.02,0xffffff,.9));
+    glint.position.set(side*.22+.025,.065,.055);eyeGroup.add(glint);
    });
-   const smileCurve=new THREE.QuadraticBezierCurve3(new THREE.Vector3(-.13,-.18,.89),new THREE.Vector3(0,-.27,.91),new THREE.Vector3(.13,-.18,.89));
-   const smile=new THREE.Mesh(new THREE.TubeGeometry(smileCurve,20,.022,8,false),cyan);root.add(smile);
-   const finGeo=new THREE.SphereGeometry(1,32,24);
-   const fins=[];
+   const smileCurve=new THREE.QuadraticBezierCurve3(new THREE.Vector3(-.12,-.12,.855),new THREE.Vector3(0,-.19,.87),new THREE.Vector3(.12,-.12,.855));
+   root.add(new THREE.Mesh(new THREE.TubeGeometry(smileCurve,20,.018,8,false),cyan));
+
+   // Dorsal fin: custom rounded triangular fin along the whale's back.
+   const finShape=new THREE.Shape();
+   finShape.moveTo(-.25,0);finShape.quadraticCurveTo(-.18,.38,-.02,.58);finShape.quadraticCurveTo(.12,.62,.18,.42);finShape.lineTo(.28,0);finShape.closePath();
+   const dorsalGeo=new THREE.ExtrudeGeometry(finShape,{depth:.12,bevelEnabled:true,bevelSegments:4,steps:1,bevelSize:.045,bevelThickness:.04});
+   const dorsal=new THREE.Mesh(dorsalGeo,midnight);dorsal.position.set(-.35,.47,-.2);root.add(dorsal);
+   const flippers=[];
    [-1,1].forEach(side=>{
-    const fin=new THREE.Mesh(finGeo,pearl);fin.scale.set(.22,.48,.19);fin.position.set(side*.82,-.56,.03);fin.rotation.z=side*-.42;root.add(fin);fins.push(fin);
-    const shoulder=new THREE.Mesh(new THREE.SphereGeometry(.2,24,18),lavender);shoulder.position.set(side*.7,-.12,.02);root.add(shoulder);
+    const fin=make(sphere,midnight,[-.18+side*.55,-.53,.02],[.22,.5,.16],[0,0,side*.48]);
+    flippers.push(fin);
+    make(sphere,white,[-.18+side*.55,-.57,.13],[.13,.31,.055],[0,0,side*.48]);
    });
-   const tail=new THREE.Mesh(finGeo,lavender);tail.scale.set(.43,.16,.14);tail.position.set(-.95,-.05,-.3);tail.rotation.z=-.15;root.add(tail);
-   const antenna=new THREE.Mesh(new THREE.SphereGeometry(.075,20,16),softCyan);antenna.position.set(0,1.62,0);root.add(antenna);
-   const halo=new THREE.Mesh(new THREE.TorusGeometry(.12,.018,8,32),cyan);halo.position.set(0,1.62,0);root.add(halo);
+   // Tail stock and two lobes visible behind the body.
+   const tailStock=make(sphere,midnight,[-1.35,-.12,-.06],[.48,.19,.22],[0,0,-.08]);
+   const tailGroup=new THREE.Group();tailGroup.position.set(-1.63,-.1,-.08);root.add(tailGroup);
+   const lobe1=new THREE.Mesh(sphere,midnight);lobe1.scale.set(.48,.17,.12);lobe1.position.set(-.28,.19,0);lobe1.rotation.z=.3;tailGroup.add(lobe1);
+   const lobe2=new THREE.Mesh(sphere,midnight);lobe2.scale.set(.48,.17,.12);lobe2.position.set(-.28,-.19,0);lobe2.rotation.z=-.3;tailGroup.add(lobe2);
+   // Subtle cyan gill/energy accents.
+   for(let i=0;i<3;i++){
+    const gill=make(new THREE.TorusGeometry(.07,.012,8,20),glow,[-.83+i*.09,-.1,.55],[1,1,1],[0,0,Math.PI/2]);
+   }
+
    let targetX=0,targetY=0,lookX=0,lookY=0,lastBlink=0,blink=0;
-   const onPointer=e=>{const r=host.getBoundingClientRect();targetY=((e.clientX-r.left)/r.width-.5)*.48;targetX=-((e.clientY-r.top)/r.height-.5)*.35;};
+   const onPointer=e=>{const r=host.getBoundingClientRect();targetY=((e.clientX-r.left)/r.width-.5)*.42;targetX=-((e.clientY-r.top)/r.height-.5)*.3;};
    const onLeave=()=>{targetX=0;targetY=0;};
    host.addEventListener('pointermove',onPointer);host.addEventListener('pointerleave',onLeave);
    const clock=new THREE.Clock();
@@ -69,28 +92,31 @@ function Orka3D({mood='idle',small=false,onClick,className=''}) {
     if(disposed)return;
     frame=requestAnimationFrame(animate);
     const t=clock.getElapsedTime();
-    const isThinking=mood==='think',isListening=mood==='listen';
+    const thinking=mood==='think',listening=mood==='listen';
     lookX+=(targetX-lookX)*.055;lookY+=(targetY-lookY)*.055;
-    root.rotation.y=lookX+Math.sin(t*.65)*.035;
-    root.rotation.x=lookY+(isListening?-.035:0);
-    root.position.y=Math.sin(t*(isThinking?2.2:1.05))*(isThinking?.065:.035);
-    root.rotation.z=Math.sin(t*.7)*.018;
-    fins[0].rotation.z=-.42+Math.sin(t*1.5)*.07;fins[1].rotation.z=.42-Math.sin(t*1.5)*.07;
-    tail.rotation.y=Math.sin(t*1.7)*.16;
-    antenna.scale.setScalar(1+(isThinking?.18:.07)*(.5+.5*Math.sin(t*4)));
+    root.rotation.y=lookX+Math.sin(t*.45)*.045;
+    root.rotation.x=lookY+(listening?-.025:0);
+    root.position.y=Math.sin(t*(thinking?2.1:.85))*(thinking?.055:.028);
+    root.rotation.z=Math.sin(t*.55)*.012;
+    tailGroup.rotation.y=Math.sin(t*1.45)*.3;
+    tailGroup.rotation.z=Math.sin(t*1.45)*.09;
+    flippers[0].rotation.z=-.48+Math.sin(t*1.2)*.045;
+    flippers[1].rotation.z=.48-Math.sin(t*1.2)*.045;
+    eyeGroup.position.x=lookX*.22;eyeGroup.position.y=.24+lookY*.16;
     const elapsed=t-lastBlink;
-    if(elapsed>(isThinking?1.8:3.2)+Math.sin(t*.31)*.7){lastBlink=t;blink=.001;}
-    if(blink>0){blink=Math.min(1,blink+.18);const sy=Math.max(.08,1-Math.sin(blink*Math.PI)*.94);eyes.forEach(e=>e.scale.y=sy*1.22);if(blink>=1)blink=0;}
-    else eyes.forEach(e=>e.scale.y=isListening?1.38:1.22);
-    eyeGroup.position.x=lookX*.25;eyeGroup.position.y=.48+lookY*.18;
+    if(elapsed>(thinking?1.9:3.4)+Math.sin(t*.27)*.8){lastBlink=t;blink=.001;}
+    if(blink>0){blink=Math.min(1,blink+.18);const sy=Math.max(.08,1-Math.sin(blink*Math.PI)*.94);eyes.forEach(e=>e.scale.y=sy*1.2);if(blink>=1)blink=0;}
+    else eyes.forEach(e=>e.scale.y=listening?1.32:1.2);
+    visorRim.material.emissiveIntensity=thinking?3.4:listening?2.8:1.5;
     renderer.render(scene,camera);
    };
    animate();
-   host._cleanup=()=>{host.removeEventListener('pointermove',onPointer);host.removeEventListener('pointerleave',onLeave);observer?.disconnect();cancelAnimationFrame(frame);scene.traverse(o=>{o.geometry?.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});renderer?.dispose();renderer?.domElement.remove();};
+   cleanup=()=>{host.removeEventListener('pointermove',onPointer);host.removeEventListener('pointerleave',onLeave);observer?.disconnect();cancelAnimationFrame(frame);scene.traverse(o=>{o.geometry?.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});renderer?.dispose();renderer?.domElement.remove();};
+   host._cleanup=cleanup;
   }).catch(err=>console.error('Orka 3D avatar failed to load',err));
   return()=>{disposed=true;host?._cleanup?.();};
  },[mood]);
- return <div ref={mount} className={'orka-scene '+(small?'orka-scene-small ':'')+className} role={onClick?'button':'img'} tabIndex={onClick?0:undefined} aria-label="Orka interactive 3D assistant" onClick={onClick} onKeyDown={e=>{if(onClick&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onClick();}}}/>;
+ return <div ref={mount} className={'orka-scene '+(small?'orka-scene-small ':'')+className} role={onClick?'button':'img'} tabIndex={onClick?0:undefined} aria-label="Orka whale-inspired interactive 3D assistant" onClick={onClick} onKeyDown={e=>{if(onClick&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onClick();}}}/>;
 }
 function Robot({mood='idle',small=false,onClick}) {return <Orka3D mood={mood} small={small} onClick={onClick}/>;}
 function OrcaWidget({thinking,listening,onOpenChat}) {
