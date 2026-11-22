@@ -495,3 +495,21 @@ body{overflow:hidden}
 .nexa-mood-think .bot-screen span{animation:nexa-spark 1s ease-in-out infinite}
 @keyframes nexa-eye-glow{0%,100%{filter:brightness(.9)}50%{filter:brightness(1.35)}}
 @media(max-width:760px){.nexa-art-wrap{max-width:155px;max-height:145px}.live-bot{transform:scale(.67)}.nexa-art-small .live-bot{transform:scale(.22)}}
+
+
+/* Final 3D material pass: sculpted ceramic shell, glass visor and layered lighting */
+.live-bot{perspective:900px;transform-style:preserve-3d;filter:drop-shadow(0 22px 24px #03061199) drop-shadow(0 0 16px #9bceff22)}
+.bot-head{transform:translateX(-50%) rotateX(-7deg);border:1px solid #ffffffd9;background:linear-gradient(128deg,#fff 0%,#f7fbff 18%,#dce7f5 43%,#9eafc8 69%,#f9fcff 88%,#b9c9df 100%);box-shadow:inset 0 7px 9px #fff,inset 0 -9px 13px #8298b8,3px 7px 12px #24314c66,0 13px 24px #05091666}
+.bot-head:after{content:"";position:absolute;z-index:2;top:8px;left:20px;width:72px;height:13px;border-radius:50%;background:linear-gradient(90deg,#ffffffaa,#ffffff00);filter:blur(2px);transform:rotate(-9deg);pointer-events:none}
+.bot-head:before{inset:8px 9px 10px;border:1px solid #8ea8c9;border-radius:42px;background:linear-gradient(155deg,#263c5d 0%,#0b1429 45%,#050b19 78%,#172b49 100%);box-shadow:inset 0 5px 11px #000c,inset 0 -2px 9px #9ddaff33,0 0 0 1px #fff8}
+.bot-eye{position:relative;z-index:3;background:radial-gradient(ellipse at 35% 28%,#fff 0%,#d8ffff 8%,#8ff5ff 20%,#4bc7f4 42%,#17699f 68%,#10213e 100%);box-shadow:inset 0 4px 7px #fff9,inset 0 -5px 8px #071a3c,0 0 8px #67eaff,0 0 18px #31bfff88,0 0 1px 2px #9cefff66}
+.bot-eye i{width:9px;height:9px;top:5px;left:9px;background:radial-gradient(circle at 35% 35%,#fff,#eaffff 65%);box-shadow:0 0 10px 3px #d8ffffaa}
+.bot-eye:before{content:"";position:absolute;inset:3px 5px auto;height:8px;border-radius:50%;background:#ffffff55;filter:blur(3px)}
+.bot-neck{height:21px;border:1px solid #a9bdd5;background:linear-gradient(90deg,#8295b0,#fdfefe 25%,#c9d8e9 55%,#8195b2);box-shadow:inset 0 2px 3px #fff,0 4px 8px #03081766}
+.bot-torso{border:1px solid #ffffff;background:linear-gradient(132deg,#fff 0%,#f3f8ff 22%,#d7e2f0 51%,#a7b9d1 76%,#f9fcff 100%);box-shadow:inset 0 7px 9px #fff,inset 0 -9px 13px #8499b7,4px 10px 16px #02081766,0 0 0 1px #8da4c366}
+.bot-torso:before{content:"";position:absolute;top:8px;left:15px;width:42px;height:8px;border-radius:50%;background:#fff;opacity:.8;filter:blur(4px)}
+.bot-screen{border:1px solid #d7f5ff;background:radial-gradient(circle at 35% 25%,#fff 0%,#e7fbff 24%,#a9d9f0 60%,#6699c5 100%);box-shadow:inset 0 5px 8px #fff,inset 0 -5px 9px #3e719e66,0 0 13px #65dfff77}
+.bot-screen span{color:#169bc9;text-shadow:0 0 5px #fff,0 0 12px #4bdfff}
+.bot-shadow{background:radial-gradient(ellipse,#61caff66 0%,#8a6dff22 48%,transparent 75%);filter:blur(14px)}
+@keyframes nexa-hover{0%,100%{transform:translateY(0) rotateY(-2deg)}50%{transform:translateY(-9px) rotateY(2deg)}}
+@media(prefers-reduced-motion:reduce){.bot-eye{animation:none!important}}
