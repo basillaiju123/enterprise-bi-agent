@@ -163,6 +163,7 @@ def get_usage_summary(thread_id: str | None = None, limit: int = 100) -> dict:
                 model TEXT NOT NULL,
                 prompt_tokens INTEGER NOT NULL,
                 completion_tokens INTEGER NOT NULL,
+                cached_tokens INTEGER NOT NULL DEFAULT 0,
                 total_tokens INTEGER NOT NULL,
                 cost_usd REAL NOT NULL,
                 cost_inr REAL NOT NULL
