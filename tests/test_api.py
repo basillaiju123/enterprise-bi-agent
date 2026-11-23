@@ -84,3 +84,14 @@ def test_health():
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json()["status"] == "healthy"
+
+
+def test_usage_endpoint():
+    response = client.get("/usage")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "totals" in data
+    assert "input_tokens" in data["totals"]
+    assert "average_cost_per_successful_query_inr" in data["totals"]
+    assert "by_node" in data
