@@ -63,11 +63,20 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run Orka.ai live Groq SQL evaluation.")
     parser.add_argument("--dataset", default=str(DEFAULT_DATASET_PATH), help="Path to a JSON evaluation dataset.")
     parser.add_argument("--run-id", default="run1", help="Run label for the output report filename.")
+    parser.add_argument(
+        "--min-request-interval",
+        type=float,
+        default=20.0,
+        help="Minimum seconds between Groq HTTP attempts, including retries (default: 20).",
+    )
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
+
+    if args.min_request_interval < 0:
+        raise SystemExit("--min-request-interval must be zero or greater.")
 
     if not re.fullmatch(r"[A-Za-z0-9_-]+", args.run_id):
         raise SystemExit("Invalid run ID. Use letters, numbers, hyphens or underscores.")
@@ -123,11 +132,24 @@ def main():
 
     usage = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
     original_create = nodes.client.chat.completions.create
+    last_request_started = None
 
-    def tracked_create(*args, **kwargs):
+    def tracked_create(*call_args, **kwargs):
+        nonlocal last_request_started
+
+        # Pace every actual HTTP attempt, including retries made by nodes.py.
+        now = time.monotonic()
+        if last_request_started is not None:
+            elapsed = now - last_request_started
+            remaining = args.min_request_interval - elapsed
+            if remaining > 0:
+                time.sleep(remaining)
+
+        last_request_started = time.monotonic()
+
         # Count attempted API requests, including requests that raise an exception.
         usage["calls"] += 1
-        response = original_create(*args, **kwargs)
+        response = original_create(*call_args, **kwargs)
         token_usage = getattr(response, "usage", None)
         if token_usage is not None:
             usage["prompt_tokens"] += getattr(token_usage, "prompt_tokens", 0) or 0
@@ -251,6 +273,7 @@ def main():
         "groq_generation_calls": usage["calls"],
         "token_usage": usage,
         "median_latency_seconds": median_latency,
+        "min_request_interval_seconds": args.min_request_interval,
         "total_duration_seconds": round(time.perf_counter() - started_all, 2),
         "category_counts": dict(category_counts),
         "methodology": {
@@ -263,6 +286,8 @@ def main():
             "sql_correction_retries": False,
             "rate_limit_retries": True,
             "rate_limit_retry_count": nodes.RATE_LIMIT_RETRY_COUNT,
+            "request_pacing": True,
+            "request_pacing_applies_to_retries": True,
             "timeout_retries": True,
             "timeout_retry_count": nodes.TIMEOUT_RETRY_COUNT,
             "sdk_retries": False,
@@ -287,6 +312,7 @@ def main():
     print(f"Passed: {passed}/{len(cases)} ({report['pass_rate_percent']}%)")
     print(f"Failed: {failed} | Errors: {errors}")
     print(f"Groq generation calls: {usage['calls']}")
+    print(f"Minimum request interval: {args.min_request_interval:.1f}s")
     print(f"Token usage: {usage['total_tokens']}")
     print(f"Median latency: {median_latency:.3f}s")
     print(f"Report: {output_path}")
