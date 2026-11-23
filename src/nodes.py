@@ -162,6 +162,7 @@ SQL GENERATION RULES:
 - Order quantity = SUM(order_items.quantity); do not confuse quantity with revenue.
 - Never invent a revenue column or use SUM(quantity) as revenue.
 - Average order value = revenue divided by the distinct order count for the population requested in the question.
+- When calculating average order value, use average_order_value as the output alias, never avg_order_value.
 - Apply a Completed status filter only when the question explicitly requests completed orders.
 - If the question says all orders, include all order statuses unless another explicit condition restricts them.
 - Keep the revenue numerator and distinct-order denominator consistent with the same requested population.
