@@ -1,3 +1,4 @@
+
 SQL_EXAMPLES = [
     {
         "id": "sql_example_customers_india",
@@ -63,5 +64,25 @@ JOIN products
     ON order_items.product_id = products.product_id;
 """,
         "description": "Calculate revenue from order item quantities and product prices."
+    },
+    {
+        "id": "sql_example_customer_completed_spend",
+        "question": "Show the total completed-order spend for each customer.",
+        "sql": """
+SELECT
+    c.customer_name,
+    SUM(oi.quantity * p.price) AS completed_spend
+FROM customers c
+JOIN orders o
+    ON c.customer_id = o.customer_id
+JOIN order_items oi
+    ON o.order_id = oi.order_id
+JOIN products p
+    ON oi.product_id = p.product_id
+WHERE o.status = 'Completed'
+GROUP BY c.customer_id, c.customer_name
+ORDER BY completed_spend DESC, c.customer_name;
+""",
+        "description": "Calculate total completed-order spend for each customer using customer names and grouping by customer."
     }
 ]

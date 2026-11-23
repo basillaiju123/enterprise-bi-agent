@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from collections import Counter
@@ -67,6 +68,17 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", args.run_id):
+        raise SystemExit("Invalid run ID. Use letters, numbers, hyphens or underscores.")
+
+    output_path = RESULTS_DIR / f"groq_eval_100_{args.run_id}.json"
+
+    if output_path.exists():
+        raise SystemExit(
+            f"Report already exists. Choose a different --run-id: {output_path}"
+        )
+
     dataset_path = Path(args.dataset).resolve()
     if not os.getenv("GROQ_API_KEY"):
         raise SystemExit("GROQ_API_KEY is missing. Add it to the project .env file.")
@@ -86,6 +98,19 @@ def main():
         missing = required - set(case)
         if missing:
             raise SystemExit(f"Case {index} is missing fields: {sorted(missing)}")
+
+    # Precompute every gold result before any Groq API calls.
+    gold_results = []
+    try:
+        for case in cases:
+            gold_results.append(run_query_with_columns(case["gold_sql"]))
+    except Exception as exc:
+        raise SystemExit(
+            f"Gold SQL preflight failed for case {case.get('id', 'UNKNOWN')}: "
+            f"{type(exc).__name__}: {exc}"
+        )
+
+    print(f"Gold SQL preflight passed: {len(gold_results)} cases.")
 
     # Import after loading environment variables. These are the actual app modules.
     from src import nodes, router, evaluation_node
@@ -120,10 +145,10 @@ def main():
     with patch.object(nodes.client.chat.completions, "create", side_effect=tracked_create), \
          patch.object(evaluation_node, "evaluate_sql", return_value=(True, "LLM judge disabled; gold-result oracle is authoritative.")):
 
-        for case in cases:
+        for case_index, case in enumerate(cases):
             category_counts[case["category"]] += 1
             case_started = time.perf_counter()
-            expected_columns, expected = run_query_with_columns(case["gold_sql"])
+            expected_columns, expected = gold_results[case_index]
 
             initial_state = {
                 "user_question": case["question"],
@@ -156,6 +181,7 @@ def main():
             }
             calls_before = usage["calls"]
             rate_limit_retries_before = nodes.RATE_LIMIT_RETRY_COUNT
+            timeout_retries_before = nodes.TIMEOUT_RETRY_COUNT
 
             try:
                 final_state = graph.invoke(
@@ -192,6 +218,9 @@ def main():
 
             record["groq_generation_calls"] = usage["calls"] - calls_before
             record["rate_limit_retry_count"] = nodes.RATE_LIMIT_RETRY_COUNT - rate_limit_retries_before
+            record["timeout_retry_count"] = (
+                nodes.TIMEOUT_RETRY_COUNT - timeout_retries_before
+            )
             record["latency_seconds"] = round(time.perf_counter() - case_started, 3)
             results.append(record)
 
@@ -234,6 +263,8 @@ def main():
             "sql_correction_retries": False,
             "rate_limit_retries": True,
             "rate_limit_retry_count": nodes.RATE_LIMIT_RETRY_COUNT,
+            "timeout_retries": True,
+            "timeout_retry_count": nodes.TIMEOUT_RETRY_COUNT,
             "sdk_retries": False,
             "generation_calls_include_failed_http_requests": True,
             "semantic_cache": "bypassed using evaluation_mode",
@@ -250,7 +281,6 @@ def main():
     }
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = RESULTS_DIR / f"groq_eval_100_{args.run_id}.json"
     output_path.write_text(json.dumps(report, indent=2, default=json_safe), encoding="utf-8")
 
     print("\n========== GROQ EVALUATION SUMMARY ==========")

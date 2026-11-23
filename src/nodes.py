@@ -1,4 +1,4 @@
-from groq import Groq, RateLimitError
+﻿from groq import Groq, RateLimitError, APITimeoutError
 from dotenv import load_dotenv
 from langfuse import observe
 import os
@@ -13,11 +13,16 @@ load_dotenv()
 # Disable SDK-level retries so the bounded retry policy below is predictable.
 client = Groq(
     api_key=os.getenv("GROQ_API_KEY"),
+    timeout=60.0,
     max_retries=0,
 )
 
 MODEL_NAME = "openai/gpt-oss-20b"
+
 MAX_RATE_LIMIT_RETRIES = 3
+MAX_TIMEOUT_RETRIES = 1
+MAX_TOTAL_RETRIES = 3
+TIMEOUT_RETRY_DELAY = 2.0
 
 
 def _rate_limit_wait_seconds(error: RateLimitError, attempt: int) -> float:
@@ -47,28 +52,57 @@ def _rate_limit_wait_seconds(error: RateLimitError, attempt: int) -> float:
 
 
 RATE_LIMIT_RETRY_COUNT = 0
+TIMEOUT_RETRY_COUNT = 0
 
 
 def _generate_with_rate_limit_retry(prompt: str):
     global RATE_LIMIT_RETRY_COUNT
+    global TIMEOUT_RETRY_COUNT
 
-    for attempt in range(MAX_RATE_LIMIT_RETRIES + 1):
+    rate_limit_retries = 0
+    timeout_retries = 0
+    total_retries = 0
+
+    while True:
         try:
             return client.chat.completions.create(
                 model=MODEL_NAME,
                 messages=[{"role": "user", "content": prompt}],
             )
+
+        except APITimeoutError:
+            if (
+                timeout_retries >= MAX_TIMEOUT_RETRIES
+                or total_retries >= MAX_TOTAL_RETRIES
+            ):
+                raise
+
+            TIMEOUT_RETRY_COUNT += 1
+            timeout_retries += 1
+            total_retries += 1
+
+            time.sleep(TIMEOUT_RETRY_DELAY)
+
         except RateLimitError as error:
-            # A TPD (tokens-per-day) exhaustion cannot recover during this run.
-            # Retrying only burns time and repeats the same rejected request.
             if "tokens per day (tpd)" in str(error).lower():
                 raise
-            if attempt >= MAX_RATE_LIMIT_RETRIES:
-                raise
-            RATE_LIMIT_RETRY_COUNT += 1
-            wait_seconds = _rate_limit_wait_seconds(error, attempt)
-            time.sleep(wait_seconds)
 
+            if (
+                rate_limit_retries >= MAX_RATE_LIMIT_RETRIES
+                or total_retries >= MAX_TOTAL_RETRIES
+            ):
+                raise
+
+            wait_seconds = _rate_limit_wait_seconds(
+                error,
+                rate_limit_retries,
+            )
+
+            RATE_LIMIT_RETRY_COUNT += 1
+            rate_limit_retries += 1
+            total_retries += 1
+
+            time.sleep(wait_seconds)
 
 @observe(name="generate_sql")
 def generate_sql_node(state: AgentState) -> AgentState:
@@ -127,10 +161,23 @@ SQL GENERATION RULES:
 - When filtering revenue by order status, apply the status filter on orders.
 - Order quantity = SUM(order_items.quantity); do not confuse quantity with revenue.
 - Never invent a revenue column or use SUM(quantity) as revenue.
-- Average order value = completed-order revenue divided by COUNT(DISTINCT orders.order_id).
+- Average order value = revenue divided by the distinct order count for the population requested in the question.
+- Apply a Completed status filter only when the question explicitly requests completed orders.
+- If the question says all orders, include all order statuses unless another explicit condition restricts them.
+- Keep the revenue numerator and distinct-order denominator consistent with the same requested population.
 
 4. AGGREGATION AND FILTERS
 - Apply every condition stated in the question.
+- QUESTION SCOPE PRESERVATION:
+  - Do not add status, date, country, category, or other filters unless explicitly requested or required by a documented business definition.
+  - Do not assume that revenue, spending, or order-value questions refer only to completed orders.
+  - Words such as "all", "each", and "every" must preserve the full population specified by the question.
+  - Do not silently narrow the population using inferred business assumptions.
+- AGGREGATION CORRECTNESS:
+  - Identify the exact entity being counted or aggregated before choosing COUNT, SUM, or AVG.
+  - Use COUNT(DISTINCT entity_id) when joins can multiply that entity.
+  - Do not change the requested aggregation into a different metric.
+  - Preserve the requested grouping dimensions and sort order when specified.
 - Group only by the requested dimensions.
 - Use COUNT(DISTINCT orders.order_id) when joins to order_items could multiply order rows.
 - Use categorical values and aliases documented in the retrieved knowledge, such as UK for United Kingdom.
