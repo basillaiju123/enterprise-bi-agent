@@ -156,6 +156,16 @@ The project evaluates generated SQL and final database results. Langfuse traces 
 
 A 30-query deterministic replay benchmark reported 30/30 cases passed. This replay result is not a guarantee of general LLM accuracy; an earlier fresh-generation run achieved 28/30 fully passed cases (93.3%).
 
+## API Usage & Cost Tracking
+
+Groq usage is recorded from the token counts returned by the Groq SDK for every SQL-generation and correction call. Usage is persisted in a local SQLite database at `data/api_usage.sqlite` (ignored by Git).
+
+- `GET /usage` returns lifetime input/output/total tokens, LLM call count, total spend, usage by LangGraph node, recent calls, query outcomes, and average cost per successful query.
+- `POST /query` includes per-request token usage and estimated USD/INR cost in its response.
+- The Orka sidebar includes an **API Usage** panel for aggregate spend, tokens, successful-query average, and node-level cost breakdown.
+
+Default GPT-OSS-20B rates are configurable with `GROQ_INPUT_USD_PER_MILLION` (0.075), `GROQ_OUTPUT_USD_PER_MILLION` (0.30), and `USD_TO_INR` (89). These defaults are estimates and should be updated if Groq changes its pricing or the desired exchange rate. Set `API_USAGE_DB_PATH` to change the SQLite location.
+
 ## API
 
 | Method | Endpoint | Purpose |
