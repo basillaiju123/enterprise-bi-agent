@@ -148,6 +148,8 @@ SQL GENERATION RULES:
 
 2. OUTPUT COLUMNS
 - Return exactly the fields requested by the user; do not add IDs or other unrequested columns.
+- Always assign descriptive snake_case aliases to aggregate expressions; never leave database-generated names such as count_star() or sum(...).
+- Name count outputs after the entity being counted, such as customer_count for customer counts and order_count for order counts.
 - When a numeric attribute is used to qualify listed entities (for example, products costing more than a threshold), include that attribute in the output unless the user explicitly asks for names only.
 - When a customer name is requested, select customers.customer_name and join customers through customer_id.
 - When a product name is requested, select products.product_name and join products through product_id.
