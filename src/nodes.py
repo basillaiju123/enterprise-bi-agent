@@ -4,6 +4,7 @@ from langfuse import observe
 import os
 
 from src.graph_state import AgentState
+from src.cost_tracker import record_groq_usage
 
 
 load_dotenv()
@@ -85,6 +86,16 @@ Rules:
             }
         ],
     )
+
+    # Record provider-reported usage for every generation and correction call.
+    # This avoids estimating tokens from prompt text and includes retries.
+    if getattr(response, "usage", None) is not None:
+        record_groq_usage(
+            response.usage,
+            thread_id=state.get("thread_id"),
+            node="generate_sql",
+            model="openai/gpt-oss-20b",
+        )
 
     sql = response.choices[0].message.content.strip()
 
