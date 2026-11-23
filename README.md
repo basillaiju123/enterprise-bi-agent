@@ -164,7 +164,7 @@ Groq usage is recorded from the token counts returned by the Groq SDK for every 
 - `POST /query` includes per-request token usage and estimated USD/INR cost in its response.
 - The Orka sidebar includes an **API Usage** panel for aggregate spend, tokens, successful-query average, and node-level cost breakdown.
 
-Default GPT-OSS-20B rates are configurable with `GROQ_INPUT_USD_PER_MILLION` (0.075), `GROQ_OUTPUT_USD_PER_MILLION` (0.30), and `USD_TO_INR` (89). These defaults are estimates and should be updated if Groq changes its pricing or the desired exchange rate. Set `API_USAGE_DB_PATH` to change the SQLite location.
+Default GPT-OSS-20B rates are configurable with `GROQ_INPUT_USD_PER_MILLION` (0.075), `GROQ_OUTPUT_USD_PER_MILLION` (0.30), and `USD_TO_INR` (89). These defaults are estimates and should be updated if Groq changes its pricing or the desired exchange rate. Set `API_USAGE_DB_PATH` to change the SQLite location. On Render, attach a persistent disk and set this path to a file on the mounted disk (for example `/var/data/api_usage.sqlite`); otherwise usage history on an ephemeral filesystem can be lost on restart or redeploy.
 
 ## API
 
