@@ -19,3 +19,4 @@ class AgentState(TypedDict):
     cache_key: str
     evaluation_replay: bool
     replay_sql: str
+    thread_id: str
