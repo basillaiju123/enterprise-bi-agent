@@ -1509,3 +1509,25 @@ body{overflow:hidden}
   .orca-tilt { width: 72px !important; height: 72px !important; }
   .orca-tilt .orka-scene-small { width:72px !important;height:72px !important;flex-basis:72px !important; }
 }
+
+
+/* API usage and Groq cost dashboard */
+.usage-backdrop{position:fixed;inset:0;z-index:1000;background:rgba(7,15,30,.48);backdrop-filter:blur(5px);display:flex;justify-content:flex-end}
+.usage-panel{width:min(520px,100%);height:100%;overflow:auto;background:var(--panel,#fff);color:var(--text,#172033);padding:28px;box-shadow:-18px 0 60px rgba(0,0,0,.18);animation:usage-in .2s ease-out}
+@keyframes usage-in{from{transform:translateX(24px);opacity:.7}to{transform:translateX(0);opacity:1}}
+.usage-panel>header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:26px}
+.usage-panel>header>div{display:grid;gap:6px}
+.usage-panel>header b{display:flex;align-items:center;gap:9px;font-size:18px}
+.usage-panel>header small,.usage-panel .usage-kpis small,.usage-panel .usage-kpis em,.usage-node small{color:var(--muted,#7b8799)}
+.usage-panel>header button{border:0;background:transparent;color:inherit;cursor:pointer;padding:6px}
+.usage-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:28px}
+.usage-kpis>div{border:1px solid var(--border,#e6eaf0);border-radius:14px;padding:16px;display:grid;gap:7px}
+.usage-kpis strong{font-size:23px;letter-spacing:-.5px}
+.usage-kpis em{font-size:11px;font-style:normal}
+.usage-panel h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 12px}
+.usage-node{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border,#e6eaf0);font-size:13px}
+.usage-node span{display:grid;gap:4px}.usage-node b{font-variant-numeric:tabular-nums}
+.usage-empty,.usage-loading{font-size:13px;color:var(--muted,#7b8799);padding:14px 0}
+.usage-note{font-size:11px;line-height:1.6;color:var(--muted,#7b8799);margin:20px 0}
+.usage-refresh{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border,#e6eaf0);border-radius:9px;background:transparent;color:inherit;padding:9px 12px;cursor:pointer}
+@media(max-width:600px){.usage-panel{padding:20px}.usage-kpis strong{font-size:19px}}
