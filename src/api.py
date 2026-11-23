@@ -7,7 +7,7 @@ from langgraph.types import Command
 
 from src.graph import graph
 from src.security.rbac import validate_role
-from src.cost_tracker import get_usage_summary
+from src.cost_tracker import get_usage_summary, record_query_outcome
 
 
 app = FastAPI(
@@ -121,6 +121,12 @@ def query_database(request: QueryRequest):
             or result.get("execution_error", "")
             or result.get("validation_error", "")
         )
+        status = (
+            "pending"
+            if result.get("approval_required", False)
+            else "success" if not error else "failed"
+        )
+        record_query_outcome(thread_id, status)
         usage = _request_usage(thread_id)
 
         return {
@@ -167,6 +173,12 @@ def approve_query(
             or result.get("execution_error", "")
             or result.get("validation_error", "")
         )
+        status = (
+            "success"
+            if result.get("approval_status") == "approved" and not error
+            else "failed"
+        )
+        record_query_outcome(thread_id, status)
         usage = _request_usage(thread_id)
 
         return {
