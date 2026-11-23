@@ -97,6 +97,32 @@ def record_groq_usage(
     }
 
 
+def record_query_outcome(thread_id: str, status: str) -> None:
+    """Upsert the final lifecycle status for a tracked agent request."""
+    if status not in {"success", "failed", "pending"}:
+        raise ValueError("status must be success, failed, or pending")
+    with _connect() as connection:
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS query_runs (
+                thread_id TEXT PRIMARY KEY,
+                status TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO query_runs (thread_id, status, updated_at)
+            VALUES (?, ?, ?)
+            ON CONFLICT(thread_id) DO UPDATE SET
+                status = excluded.status,
+                updated_at = excluded.updated_at
+            """,
+            (thread_id, status, datetime.now(timezone.utc).isoformat()),
+        )
+
+
 def get_usage_summary(thread_id: str | None = None, limit: int = 100) -> dict:
     """Return lifetime totals, node breakdown, and recent usage events."""
     with _connect() as connection:
@@ -128,6 +154,36 @@ def get_usage_summary(thread_id: str | None = None, limit: int = 100) -> dict:
                    COALESCE(SUM(cost_usd), 0) AS cost_usd,
                    COALESCE(SUM(cost_inr), 0) AS cost_inr
             FROM groq_usage {where}
+            """,
+            params,
+        ).fetchone()
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS query_runs (
+                thread_id TEXT PRIMARY KEY,
+                status TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        outcome_where = "WHERE thread_id = ?" if thread_id else ""
+        outcomes = connection.execute(
+            f"""
+            SELECT
+                SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) AS successful_queries,
+                SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) AS failed_queries,
+                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pending_queries
+            FROM query_runs {outcome_where}
+            """,
+            params,
+        ).fetchone()
+        successful_cost = connection.execute(
+            f"""
+            SELECT COALESCE(SUM(g.cost_usd), 0) AS cost_usd,
+                   COALESCE(SUM(g.cost_inr), 0) AS cost_inr
+            FROM groq_usage g
+            INNER JOIN query_runs q ON q.thread_id = g.thread_id
+            WHERE q.status = 'success' {"AND g.thread_id = ?" if thread_id else ""}
             """,
             params,
         ).fetchone()
@@ -166,6 +222,14 @@ def get_usage_summary(thread_id: str | None = None, limit: int = 100) -> dict:
             **dict(totals),
             "cost_usd": round(totals["cost_usd"], 8),
             "cost_inr": round(totals["cost_inr"], 6),
+            "successful_queries": outcomes["successful_queries"] or 0,
+            "failed_queries": outcomes["failed_queries"] or 0,
+            "pending_queries": outcomes["pending_queries"] or 0,
+            "successful_query_cost_usd": round(successful_cost["cost_usd"], 8),
+            "successful_query_cost_inr": round(successful_cost["cost_inr"], 6),
+            "average_cost_per_successful_query_inr": round(
+                successful_cost["cost_inr"] / outcomes["successful_queries"], 6
+            ) if outcomes["successful_queries"] else 0.0,
         },
         "by_node": [dict(row) for row in by_node],
         "recent": [dict(row) for row in recent],
