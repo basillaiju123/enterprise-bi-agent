@@ -82,10 +82,12 @@ def main():
         raise SystemExit("Invalid run ID. Use letters, numbers, hyphens or underscores.")
 
     output_path = RESULTS_DIR / f"groq_eval_100_{args.run_id}.json"
+    checkpoint_path = RESULTS_DIR / f"groq_eval_100_{args.run_id}.partial.json"
 
-    if output_path.exists():
+    if output_path.exists() or checkpoint_path.exists():
+        existing_path = output_path if output_path.exists() else checkpoint_path
         raise SystemExit(
-            f"Report already exists. Choose a different --run-id: {output_path}"
+            f"Report or partial checkpoint already exists. Choose a different --run-id: {existing_path}"
         )
 
     dataset_path = Path(args.dataset).resolve()
@@ -253,6 +255,34 @@ def main():
                 f"latency={record['latency_seconds']:.2f}s"
             )
 
+            # Persist completed cases atomically so Ctrl+C or a process crash
+            # cannot discard earlier benchmark results.
+            checkpoint = {
+                "benchmark": "Orka.ai live Groq SQL evaluation (partial checkpoint)",
+                "run_at_utc": datetime.now(timezone.utc).isoformat(),
+                "model": MODEL_NAME,
+                "dataset": str(dataset_path),
+                "run_id": args.run_id,
+                "completed_cases": len(results),
+                "total_cases": len(cases),
+                "passed": sum(item["status"] == "passed" for item in results),
+                "failed": sum(item["status"] == "failed" for item in results),
+                "errors": sum(item["status"] == "error" for item in results),
+                "groq_generation_calls": usage["calls"],
+                "token_usage": usage,
+                "min_request_interval_seconds": args.min_request_interval,
+                "cases": results,
+            }
+            RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+            checkpoint_tmp = checkpoint_path.with_suffix(
+                checkpoint_path.suffix + ".tmp"
+            )
+            checkpoint_tmp.write_text(
+                json.dumps(checkpoint, indent=2, default=json_safe),
+                encoding="utf-8",
+            )
+            checkpoint_tmp.replace(checkpoint_path)
+
     passed = sum(item["status"] == "passed" for item in results)
     failed = sum(item["status"] == "failed" for item in results)
     errors = sum(item["status"] == "error" for item in results)
@@ -307,6 +337,8 @@ def main():
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, indent=2, default=json_safe), encoding="utf-8")
+    if checkpoint_path.exists():
+        checkpoint_path.unlink()
 
     print("\n========== GROQ EVALUATION SUMMARY ==========")
     print(f"Passed: {passed}/{len(cases)} ({report['pass_rate_percent']}%)")
