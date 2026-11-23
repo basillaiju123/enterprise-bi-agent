@@ -19,3 +19,5 @@ evaluation_output.txt
 node_modules/
 frontend/.env
 frontend/dist/
+
+data/api_usage.sqlite
