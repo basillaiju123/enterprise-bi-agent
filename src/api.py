@@ -70,6 +70,7 @@ def _request_usage(thread_id: str) -> dict:
     return {
         "input_tokens": totals["input_tokens"],
         "output_tokens": totals["output_tokens"],
+        "cached_input_tokens": totals["cached_input_tokens"],
         "total_tokens": totals["total_tokens"],
         "llm_calls": totals["llm_calls"],
         "cost_usd": totals["cost_usd"],
