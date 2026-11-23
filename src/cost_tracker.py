@@ -9,6 +9,9 @@ from typing import Any
 MODEL_NAME = "openai/gpt-oss-20b"
 INPUT_USD_PER_MILLION = float(os.getenv("GROQ_INPUT_USD_PER_MILLION", "0.075"))
 OUTPUT_USD_PER_MILLION = float(os.getenv("GROQ_OUTPUT_USD_PER_MILLION", "0.30"))
+CACHED_INPUT_USD_PER_MILLION = float(
+    os.getenv("GROQ_CACHED_INPUT_USD_PER_MILLION", "0.0375")
+)
 USD_TO_INR = float(os.getenv("USD_TO_INR", "89"))
 DB_PATH = Path(os.getenv("API_USAGE_DB_PATH", "data/api_usage.sqlite"))
 
@@ -20,9 +23,22 @@ def _connect() -> sqlite3.Connection:
     return connection
 
 
-def _cost(prompt_tokens: int, completion_tokens: int) -> tuple[float, float]:
+def _read_usage_value(obj: Any, key: str, default: int = 0) -> int:
+    if isinstance(obj, dict):
+        return int(obj.get(key, default) or default)
+    return int(getattr(obj, key, default) or default)
+
+
+def _cost(
+    prompt_tokens: int,
+    completion_tokens: int,
+    cached_tokens: int = 0,
+) -> tuple[float, float]:
+    cached_tokens = max(0, min(cached_tokens, prompt_tokens))
+    uncached_tokens = prompt_tokens - cached_tokens
     usd = (
-        prompt_tokens * INPUT_USD_PER_MILLION
+        uncached_tokens * INPUT_USD_PER_MILLION
+        + cached_tokens * CACHED_INPUT_USD_PER_MILLION
         + completion_tokens * OUTPUT_USD_PER_MILLION
     ) / 1_000_000
     return usd, usd * USD_TO_INR
@@ -36,13 +52,20 @@ def record_groq_usage(
     model: str = MODEL_NAME,
 ) -> dict:
     """Persist usage returned by the Groq SDK and return its cost breakdown."""
-    prompt_tokens = int(getattr(usage, "prompt_tokens", 0) or 0)
-    completion_tokens = int(getattr(usage, "completion_tokens", 0) or 0)
-    total_tokens = int(
-        getattr(usage, "total_tokens", prompt_tokens + completion_tokens)
-        or prompt_tokens + completion_tokens
+    prompt_tokens = _read_usage_value(usage, "prompt_tokens")
+    completion_tokens = _read_usage_value(usage, "completion_tokens")
+    total_tokens = _read_usage_value(
+        usage, "total_tokens", prompt_tokens + completion_tokens
     )
-    cost_usd, cost_inr = _cost(prompt_tokens, completion_tokens)
+    prompt_details = (
+        usage.get("prompt_tokens_details", {})
+        if isinstance(usage, dict)
+        else getattr(usage, "prompt_tokens_details", None)
+    )
+    cached_tokens = _read_usage_value(prompt_details, "cached_tokens")
+    cost_usd, cost_inr = _cost(
+        prompt_tokens, completion_tokens, cached_tokens
+    )
     created_at = datetime.now(timezone.utc).isoformat()
 
     with _connect() as connection:
@@ -56,6 +79,7 @@ def record_groq_usage(
                 model TEXT NOT NULL,
                 prompt_tokens INTEGER NOT NULL,
                 completion_tokens INTEGER NOT NULL,
+                cached_tokens INTEGER NOT NULL DEFAULT 0,
                 total_tokens INTEGER NOT NULL,
                 cost_usd REAL NOT NULL,
                 cost_inr REAL NOT NULL
@@ -66,8 +90,8 @@ def record_groq_usage(
             """
             INSERT INTO groq_usage (
                 created_at, thread_id, node, model, prompt_tokens,
-                completion_tokens, total_tokens, cost_usd, cost_inr
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                completion_tokens, cached_tokens, total_tokens, cost_usd, cost_inr
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 created_at,
@@ -76,6 +100,7 @@ def record_groq_usage(
                 model,
                 prompt_tokens,
                 completion_tokens,
+                cached_tokens,
                 total_tokens,
                 cost_usd,
                 cost_inr,
@@ -86,12 +111,14 @@ def record_groq_usage(
         "model": model,
         "input_tokens": prompt_tokens,
         "output_tokens": completion_tokens,
+        "cached_input_tokens": cached_tokens,
         "total_tokens": total_tokens,
         "cost_usd": round(cost_usd, 8),
         "cost_inr": round(cost_inr, 6),
         "pricing": {
             "input_usd_per_million": INPUT_USD_PER_MILLION,
             "output_usd_per_million": OUTPUT_USD_PER_MILLION,
+            "cached_input_usd_per_million": CACHED_INPUT_USD_PER_MILLION,
             "usd_to_inr": USD_TO_INR,
         },
     }
@@ -150,6 +177,7 @@ def get_usage_summary(thread_id: str | None = None, limit: int = 100) -> dict:
                    COUNT(DISTINCT thread_id) AS tracked_queries,
                    COALESCE(SUM(prompt_tokens), 0) AS input_tokens,
                    COALESCE(SUM(completion_tokens), 0) AS output_tokens,
+                   COALESCE(SUM(cached_tokens), 0) AS cached_input_tokens,
                    COALESCE(SUM(total_tokens), 0) AS total_tokens,
                    COALESCE(SUM(cost_usd), 0) AS cost_usd,
                    COALESCE(SUM(cost_inr), 0) AS cost_inr
@@ -192,6 +220,7 @@ def get_usage_summary(thread_id: str | None = None, limit: int = 100) -> dict:
             SELECT node, COUNT(*) AS calls,
                    SUM(prompt_tokens) AS input_tokens,
                    SUM(completion_tokens) AS output_tokens,
+                   SUM(cached_tokens) AS cached_input_tokens,
                    SUM(total_tokens) AS total_tokens,
                    SUM(cost_usd) AS cost_usd,
                    SUM(cost_inr) AS cost_inr
@@ -203,7 +232,7 @@ def get_usage_summary(thread_id: str | None = None, limit: int = 100) -> dict:
         recent = connection.execute(
             f"""
             SELECT created_at, thread_id, node, model, prompt_tokens,
-                   completion_tokens, total_tokens, cost_usd, cost_inr
+                   completion_tokens, cached_tokens, total_tokens, cost_usd, cost_inr
             FROM groq_usage {where}
             ORDER BY id DESC LIMIT ?
             """,
@@ -217,6 +246,7 @@ def get_usage_summary(thread_id: str | None = None, limit: int = 100) -> dict:
         "pricing": {
             "input_usd_per_million": INPUT_USD_PER_MILLION,
             "output_usd_per_million": OUTPUT_USD_PER_MILLION,
+            "cached_input_usd_per_million": CACHED_INPUT_USD_PER_MILLION,
         },
         "totals": {
             **dict(totals),
