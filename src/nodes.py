@@ -146,11 +146,18 @@ SQL GENERATION RULES:
 - Use exact column names. Never guess conventional names such as "name" when the schema specifies "customer_name" or "product_name".
 - Use documented foreign-key relationships for joins.
 
-2. OUTPUT COLUMNS
-- Return exactly the fields requested by the user; do not add IDs or other unrequested columns.
-- Always assign descriptive snake_case aliases to aggregate expressions; never leave database-generated names such as count_star() or sum(...).
-- Name count outputs after the entity being counted, such as customer_count for customer counts and order_count for order counts.
-- When a numeric attribute is used to qualify listed entities (for example, products costing more than a threshold), include that attribute in the output unless the user explicitly asks for names only.
+2. OUTPUT COLUMNS AND RESULT GRAIN
+- Before writing SQL, determine the result grain: one row per entity, one row per group, one scalar aggregate, or one row per entity-and-period.
+- Build the SELECT projection from the question's requested answer, not merely from columns convenient for filtering or joining.
+- Return every requested output field and metric, in the order requested. Do not omit a requested dimension, descriptive attribute, or calculated metric.
+- Return only those fields. Never expose join keys, internal IDs, or other columns used only for filtering/grouping unless the question asks for them.
+- For "for each X" questions, include X and every requested measure. For ranked questions such as "which category has the highest revenue", return both the winning category and the metric used to rank it unless the user explicitly asks for the entity/name only.
+- When a question asks to list or show matching records and mentions descriptive attributes that characterize those records (such as status, country, or date), include those attributes unless the wording explicitly requests names only. A customer/order ID supplied only as a filter is not an output field.
+- For threshold questions about grouped entities (for example, customers with at least two orders), return the entity's requested display name and the qualifying count when the count is part of the condition. Do not return only its identifier.
+- When a question asks for a count of distinct items within a group, count the distinct item identifier and return the count as a metric; do not list the individual item names instead.
+- For aggregate expressions, always use a descriptive snake_case alias. Derive the alias from the metric phrase in the question, preserving meaningful qualifiers such as status, time period, and entity. Do not discard a qualifier and fall back to a generic alias such as order_count when the question asks for completed or cancelled orders.
+- Prefer the question's metric wording for aliases (for example, "average quantity" -> average_quantity, "latest order date" -> latest_order_date, and "maximum price" -> maximum_price). If no clear phrase exists, create the shortest unambiguous descriptive alias. Never leave database-generated names such as count_star() or sum(...).
+- Do not rename ordinary dimension columns without a reason; a source column named status should normally remain status, not order_status.
 - When a customer name is requested, select customers.customer_name and join customers through customer_id.
 - When a product name is requested, select products.product_name and join products through product_id.
 - Never substitute an ID for a requested name.
