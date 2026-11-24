@@ -1,0 +1,38 @@
+{
+  "title": "Orka.ai RAG retrieval paraphrase evaluation",
+  "version": 1,
+  "description": "Offline retrieval-only evaluation. Each paraphrase is mapped to the SQL example expected to support it. No Groq or Langfuse calls are made.",
+  "retrieval_top_k": 5,
+  "groups": [
+    {
+      "id": "G048",
+      "target_source": "Which customers have at least one cancelled order?",
+      "variants": [
+        "Find customers who have at least one cancelled order.",
+        "Which customers have cancelled purchases?",
+        "List customers associated with orders marked Cancelled.",
+        "Who placed at least one cancelled order?"
+      ]
+    },
+    {
+      "id": "G072",
+      "target_source": "Show distinct products included in each order.",
+      "variants": [
+        "Show distinct products included in each order.",
+        "Count unique products for every order.",
+        "For each order, how many different products were included?",
+        "Give the number of distinct product IDs per order."
+      ]
+    },
+    {
+      "id": "G077",
+      "target_source": "What is the total revenue for each product category?",
+      "variants": [
+        "Which product category has the highest total revenue?",
+        "Rank product categories by total sales value.",
+        "Which category generated the most revenue?",
+        "Calculate sales revenue for each product category and identify the highest."
+      ]
+    }
+  ]
+}
