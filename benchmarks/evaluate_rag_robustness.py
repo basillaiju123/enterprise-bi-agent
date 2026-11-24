@@ -69,7 +69,6 @@ def main() -> int:
             first_relevant_rr.append(1.0 / best_rank if best_rank else 0.0)
             query_status = "HIT" if not missing_expected else "PARTIAL" if retrieved_expected else "MISS"
         else:
-            first_relevant_rr.append(0.0)
             query_status = "NEGATIVE"
 
         forbidden_found = [
@@ -82,7 +81,7 @@ def main() -> int:
             if not forbidden_found:
                 negative_clean += 1
 
-        print(f"\\n[{case['id']}] {query_status} — {case['question']}")
+        print(f"\n[{case['id']}] {query_status} — {case['question']}")
         if expected_ids:
             print(f"  Expected docs retrieved: {len(retrieved_expected)}/{len(expected_ids)}")
             if missing_expected:
@@ -108,11 +107,11 @@ def main() -> int:
     mrr = sum(first_relevant_rr) / len(first_relevant_rr) if first_relevant_rr else 0.0
     negative_clean_rate = negative_clean / negative_total if negative_total else 0.0
 
-    print("\\n" + "=" * 78)
+    print("\n" + "=" * 78)
     print(f"Expected-document recall: {expected_retrieved}/{expected_total} ({recall:.1%})")
     print(f"MRR (first relevant document, per query): {mrr:.4f}")
     print(f"Negative-query cleanliness: {negative_clean}/{negative_total} ({negative_clean_rate:.1%})")
-    print("\\nBy category:")
+    print("\nBy category:")
     for category, stats in sorted(category_stats.items()):
         if stats["expected"]:
             score = stats["retrieved"] / stats["expected"]
@@ -121,7 +120,7 @@ def main() -> int:
             detail = "negative-query contamination checked separately"
         print(f"  {category}: {stats['queries']} queries; {detail}")
 
-    print("\\nInterpretation:")
+    print("\nInterpretation:")
     print("- Expected-document recall measures labeled knowledge coverage in the retrieved set.")
     print("- MRR uses the rank of the first expected document; schema and supporting channels are shown separately.")
     print("- Negative-query cleanliness checks only whether the three targeted SQL examples appear.")
