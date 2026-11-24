@@ -24,6 +24,7 @@ def reciprocal_rank(rank: int) -> float:
 def retrieve_knowledge(
     question: str,
     top_k: int = 5,
+    schema_top_k: int = 8,
 ) -> list[dict]:
 
     # -----------------------------
@@ -120,4 +121,19 @@ def retrieve_knowledge(
         reverse=True,
     )
 
-    return candidates[:top_k]
+    # Keep schema retrieval independent from business definitions and SQL
+    # examples. Otherwise, relevant table schemas can be crowded out of the
+    # shared top-k list by documents of other types.
+    schema_candidates = [
+        item for item in candidates
+        if item["type"] == "schema"
+    ]
+    supporting_candidates = [
+        item for item in candidates
+        if item["type"] != "schema"
+    ]
+
+    return (
+        schema_candidates[:max(0, schema_top_k)]
+        + supporting_candidates[:max(0, top_k)]
+    )
