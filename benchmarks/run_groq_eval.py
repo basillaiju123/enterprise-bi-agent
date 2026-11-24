@@ -69,6 +69,11 @@ def parse_args():
         default=20.0,
         help="Minimum seconds between Groq HTTP attempts, including retries (default: 20).",
     )
+    parser.add_argument(
+        "--resume-partial",
+        action="store_true",
+        help="Resume from the partial checkpoint for this run ID; passed/failed cases are skipped and prior API errors are retried.",
+    )
     return parser.parse_args()
 
 
@@ -84,10 +89,18 @@ def main():
     output_path = RESULTS_DIR / f"groq_eval_100_{args.run_id}.json"
     checkpoint_path = RESULTS_DIR / f"groq_eval_100_{args.run_id}.partial.json"
 
-    if output_path.exists() or checkpoint_path.exists():
-        existing_path = output_path if output_path.exists() else checkpoint_path
+    if output_path.exists():
         raise SystemExit(
-            f"Report or partial checkpoint already exists. Choose a different --run-id: {existing_path}"
+            f"Final report already exists. Choose a different --run-id: {output_path}"
+        )
+    if checkpoint_path.exists() and not args.resume_partial:
+        raise SystemExit(
+            f"Partial checkpoint exists. Use --resume-partial to continue it, "
+            f"or choose a different --run-id: {checkpoint_path}"
+        )
+    if args.resume_partial and not checkpoint_path.exists():
+        raise SystemExit(
+            f"No partial checkpoint found to resume: {checkpoint_path}"
         )
 
     dataset_path = Path(args.dataset).resolve()
@@ -109,6 +122,29 @@ def main():
         missing = required - set(case)
         if missing:
             raise SystemExit(f"Case {index} is missing fields: {sorted(missing)}")
+
+    resume_checkpoint = None
+    if args.resume_partial:
+        try:
+            resume_checkpoint = json.loads(
+                checkpoint_path.read_text(encoding="utf-8")
+            )
+        except (OSError, json.JSONDecodeError) as exc:
+            raise SystemExit(f"Could not read partial checkpoint: {exc}")
+        if resume_checkpoint.get("run_id") != args.run_id:
+            raise SystemExit("Checkpoint run ID does not match --run-id.")
+        if Path(resume_checkpoint.get("dataset", "")).resolve() != dataset_path:
+            raise SystemExit("Checkpoint dataset path does not match --dataset.")
+        if resume_checkpoint.get("total_cases") != len(cases):
+            raise SystemExit("Checkpoint case count does not match the current dataset.")
+        checkpoint_ids = {
+            item.get("id") for item in resume_checkpoint.get("cases", [])
+        }
+        unknown_ids = checkpoint_ids - set(ids)
+        if unknown_ids:
+            raise SystemExit(
+                f"Checkpoint contains case IDs absent from the dataset: {sorted(unknown_ids)}"
+            )
 
     # Precompute every gold result before any Groq API calls.
     gold_results = []
@@ -133,6 +169,11 @@ def main():
     router.MAX_RETRIES = 0
 
     usage = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+    if resume_checkpoint:
+        saved_usage = resume_checkpoint.get("token_usage", {})
+        for key in usage:
+            usage[key] = int(saved_usage.get(key, 0) or 0)
+
     original_create = nodes.client.chat.completions.create
     last_request_started = None
 
@@ -159,9 +200,25 @@ def main():
             usage["total_tokens"] += getattr(token_usage, "total_tokens", 0) or 0
         return response
 
+    # Preserve valid prior outcomes; retry prior API/runtime errors instead of
+    # treating them as SQL failures or permanently completed cases.
     results = []
-    category_counts = Counter()
+    if resume_checkpoint:
+        results = [
+            item for item in resume_checkpoint.get("cases", [])
+            if item.get("status") in {"passed", "failed"}
+        ]
+    completed_ids = {item["id"] for item in results}
+    category_counts = Counter(
+        case["category"] for case in cases if case["id"] in completed_ids
+    )
     started_all = time.perf_counter()
+
+    if resume_checkpoint:
+        print(
+            f"Resuming checkpoint: preserving {len(completed_ids)} passed/failed "
+            f"cases; retrying {len(cases) - len(completed_ids)} remaining/error cases."
+        )
 
     # The independent gold-result oracle replaces the LLM judge. The actual
     # generate_sql_node, RAG retriever, SQL validator, RBAC, and DuckDB executor
@@ -170,6 +227,8 @@ def main():
          patch.object(evaluation_node, "evaluate_sql", return_value=(True, "LLM judge disabled; gold-result oracle is authoritative.")):
 
         for case_index, case in enumerate(cases):
+            if case["id"] in completed_ids:
+                continue
             category_counts[case["category"]] += 1
             case_started = time.perf_counter()
             expected_columns, expected = gold_results[case_index]
@@ -271,6 +330,10 @@ def main():
                 "groq_generation_calls": usage["calls"],
                 "token_usage": usage,
                 "min_request_interval_seconds": args.min_request_interval,
+                "completed_case_ids": [
+                    item["id"] for item in results
+                    if item.get("status") in {"passed", "failed"}
+                ],
                 "cases": results,
             }
             RESULTS_DIR.mkdir(parents=True, exist_ok=True)
