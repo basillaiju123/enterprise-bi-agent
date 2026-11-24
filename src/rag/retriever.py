@@ -103,6 +103,7 @@ def retrieve_knowledge(
 
         candidates.append(
             {
+                "document_id": document_id,
                 "score": rrf_score,
                 "semantic_score": semantic_scores.get(
                     document_id,
