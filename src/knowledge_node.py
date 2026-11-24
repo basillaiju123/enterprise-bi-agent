@@ -12,25 +12,40 @@ def retrieve_knowledge_node(state: AgentState) -> AgentState:
     results = retrieve_knowledge(
         question,
         top_k=5,
+        schema_top_k=8,
     )
 
-    context_parts = []
+    schema_results = [
+        result for result in results
+        if result["type"] == "schema"
+    ]
+    supporting_results = [
+        result for result in results
+        if result["type"] != "schema"
+    ]
 
-    for result in results:
-        context_parts.append(
+    def format_results(items: list[dict]) -> str:
+        return "\n---\n".join(
             f"""Knowledge Type: {result["type"]}
 Source: {result["source"]}
 Relevance Score: {result["score"]:.6f}
 
 {result["text"]}
 """
+            for result in items
         )
 
-    combined_context = """
-RETRIEVED KNOWLEDGE
-===================
+    combined_context = f"""
+RETRIEVED DATABASE SCHEMA
+=========================
 
-""" + "\n---\n".join(context_parts)
+{format_results(schema_results)}
+
+RETRIEVED BUSINESS KNOWLEDGE AND SQL EXAMPLES
+=============================================
+
+{format_results(supporting_results)}
+"""
 
     return {
         **state,
