@@ -1,0 +1,126 @@
+{
+  "title": "Orka.ai expanded offline RAG robustness evaluation",
+  "version": 1,
+  "description": "Manually labeled hard paraphrases, out-of-domain negative queries, schema lookup questions, and multi-definition questions. Expected document IDs are based on the current sample warehouse knowledge catalog.",
+  "supporting_top_k": 5,
+  "schema_top_k": 8,
+  "cases": [
+    {
+      "id": "HARD_CANCELLED_01",
+      "category": "hard_paraphrase",
+      "question": "Which buyers had purchases voided?",
+      "expected_document_ids": [
+        "sql_example_customers_with_cancelled_orders",
+        "business_cancelled_order"
+      ],
+      "forbidden_document_ids": []
+    },
+    {
+      "id": "HARD_DISTINCT_01",
+      "category": "hard_paraphrase",
+      "question": "How many unique catalog items occur on each purchase?",
+      "expected_document_ids": [
+        "sql_example_distinct_products_per_order"
+      ],
+      "forbidden_document_ids": []
+    },
+    {
+      "id": "HARD_REVENUE_01",
+      "category": "hard_paraphrase",
+      "question": "Which merchandise segment generated the most sales dollars?",
+      "expected_document_ids": [
+        "sql_example_revenue_by_category",
+        "business_revenue"
+      ],
+      "forbidden_document_ids": []
+    },
+    {
+      "id": "HARD_REVENUE_02",
+      "category": "hard_paraphrase",
+      "question": "Show sales value broken down by product family.",
+      "expected_document_ids": [
+        "sql_example_revenue_by_category",
+        "business_revenue"
+      ],
+      "forbidden_document_ids": []
+    },
+    {
+      "id": "NEGATIVE_WEATHER",
+      "category": "out_of_domain_negative",
+      "question": "What is the weather forecast for tomorrow?",
+      "expected_document_ids": [],
+      "forbidden_document_ids": [
+        "sql_example_customers_with_cancelled_orders",
+        "sql_example_distinct_products_per_order",
+        "sql_example_revenue_by_category"
+      ]
+    },
+    {
+      "id": "NEGATIVE_PYTHON",
+      "category": "out_of_domain_negative",
+      "question": "Explain how Python decorators work with a simple example.",
+      "expected_document_ids": [],
+      "forbidden_document_ids": [
+        "sql_example_customers_with_cancelled_orders",
+        "sql_example_distinct_products_per_order",
+        "sql_example_revenue_by_category"
+      ]
+    },
+    {
+      "id": "NEGATIVE_PAYROLL",
+      "category": "out_of_domain_negative",
+      "question": "How many employees are currently on the company payroll?",
+      "expected_document_ids": [],
+      "forbidden_document_ids": [
+        "sql_example_customers_with_cancelled_orders",
+        "sql_example_distinct_products_per_order",
+        "sql_example_revenue_by_category"
+      ]
+    },
+    {
+      "id": "SCHEMA_CUSTOMER_DATE",
+      "category": "schema_lookup",
+      "question": "Where is the date each customer registered stored?",
+      "expected_document_ids": [
+        "schema_customers"
+      ],
+      "forbidden_document_ids": []
+    },
+    {
+      "id": "SCHEMA_ORDER_PRODUCT_LINK",
+      "category": "schema_lookup",
+      "question": "Which tables connect a purchase to the catalog items it contains?",
+      "expected_document_ids": [
+        "schema_orders",
+        "schema_order_items",
+        "schema_products"
+      ],
+      "forbidden_document_ids": []
+    },
+    {
+      "id": "MULTI_AVERAGE_COMPLETED_UK",
+      "category": "multi_definition",
+      "question": "Calculate average revenue per completed purchase for customers in the United Kingdom.",
+      "expected_document_ids": [
+        "business_average_order_value",
+        "business_completed_order",
+        "business_country_name_aliases",
+        "schema_customers",
+        "schema_orders",
+        "schema_order_items",
+        "schema_products"
+      ],
+      "forbidden_document_ids": []
+    },
+    {
+      "id": "MULTI_UNITS_REVENUE",
+      "category": "multi_definition",
+      "question": "Compare the number of units sold with the money generated from those sales.",
+      "expected_document_ids": [
+        "business_order_quantity",
+        "business_revenue"
+      ],
+      "forbidden_document_ids": []
+    }
+  ]
+}
