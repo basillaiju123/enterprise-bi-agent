@@ -37,7 +37,7 @@ def main() -> int:
     for group in dataset["groups"]:
         group_total = 0
         group_hits = 0
-        print(f"\\n[{group['id']}] Expected SQL example:")
+        print(f"\n[{group['id']}] Expected SQL example:")
         print(f"  {group['target_source']}")
 
         for question in group["variants"]:
@@ -72,7 +72,7 @@ def main() -> int:
                 reciprocal_ranks.append(0.0)
                 status = f"MISS@{top_k}"
 
-            print(f"\\n  {status}: {question}")
+            print(f"\n  {status}: {question}")
             print("  Retrieved supporting documents:")
             for rank, item in enumerate(supporting, start=1):
                 print(
@@ -82,17 +82,17 @@ def main() -> int:
 
         group_rate = group_hits / group_total if group_total else 0.0
         print(
-            f"\\n  Group result: {group_hits}/{group_total} "
+            f"\n  Group result: {group_hits}/{group_total} "
             f"({group_rate:.1%})"
         )
 
     hit_rate = hits / total if total else 0.0
     mrr = sum(reciprocal_ranks) / total if total else 0.0
-    print("\\n" + "=" * 72)
+    print("\n" + "=" * 72)
     print(f"TOTAL: {hits}/{total} relevant examples retrieved in top {top_k}")
     print(f"Hit@{top_k}: {hit_rate:.1%}")
     print(f"MRR: {mrr:.4f}")
-    print("\\nInterpretation:")
+    print("\nInterpretation:")
     print("- Hit@K measures whether the expected SQL example appears in the top K supporting documents.")
     print("- MRR rewards retrieving the expected example closer to rank 1.")
     print("- These metrics evaluate retrieval only, not SQL generation or execution.")
