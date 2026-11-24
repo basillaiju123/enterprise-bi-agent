@@ -84,8 +84,7 @@ GROUP BY c.customer_id, c.customer_name
 ORDER BY completed_spend DESC, c.customer_name;
 """,
         "description": "Calculate total completed-order spend for each customer using customer names and grouping by customer."
-    }
-    ,
+    },
     {
         "id": "sql_example_customers_with_cancelled_orders",
         "question": "Which customers have at least one cancelled order?",
