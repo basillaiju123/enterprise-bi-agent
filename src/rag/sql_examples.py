@@ -85,4 +85,48 @@ ORDER BY completed_spend DESC, c.customer_name;
 """,
         "description": "Calculate total completed-order spend for each customer using customer names and grouping by customer."
     }
+    ,
+    {
+        "id": "sql_example_customers_with_cancelled_orders",
+        "question": "Which customers have at least one cancelled order?",
+        "sql": """
+SELECT DISTINCT
+    c.customer_name
+FROM customers AS c
+JOIN orders AS o
+    ON c.customer_id = o.customer_id
+WHERE o.status = 'Cancelled'
+ORDER BY c.customer_name;
+""",
+        "description": "Find customer names associated with cancelled orders by joining customers to orders and returning distinct customers."
+    },
+    {
+        "id": "sql_example_revenue_by_category",
+        "question": "What is the total revenue for each product category?",
+        "sql": """
+SELECT
+    p.category,
+    SUM(oi.quantity * p.price) AS revenue
+FROM order_items AS oi
+JOIN products AS p
+    ON oi.product_id = p.product_id
+GROUP BY p.category
+ORDER BY revenue DESC;
+""",
+        "description": "Aggregate item quantity multiplied by product price for each product category."
+    },
+    {
+        "id": "sql_example_distinct_products_per_order",
+        "question": "How many distinct products are included in each order?",
+        "sql": """
+SELECT
+    oi.order_id,
+    COUNT(DISTINCT oi.product_id) AS distinct_products
+FROM order_items AS oi
+GROUP BY oi.order_id
+ORDER BY oi.order_id;
+""",
+        "description": "Count unique product identifiers within each order using a grouped distinct count."
+    }
+
 ]
