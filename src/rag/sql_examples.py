@@ -116,7 +116,7 @@ ORDER BY revenue DESC;
     },
     {
         "id": "sql_example_distinct_products_per_order",
-        "question": "How many distinct products are included in each order?",
+        "question": "Show distinct products included in each order.",
         "sql": """
 SELECT
     oi.order_id,
@@ -125,7 +125,7 @@ FROM order_items AS oi
 GROUP BY oi.order_id
 ORDER BY oi.order_id;
 """,
-        "description": "Count unique product identifiers within each order using a grouped distinct count."
+        "description": "For this grouped analytics request, return one row per order with the count of unique product identifiers. Interpret this wording as a distinct-product count per order, not a listing of individual product IDs or names."
     }
 
 ]
