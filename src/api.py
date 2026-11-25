@@ -7,6 +7,7 @@ from langgraph.types import Command
 
 from src.graph import graph
 from src.security.rbac import validate_role
+from src.graph_routing import get_query_status
 
 
 app = FastAPI(
@@ -37,6 +38,7 @@ class QueryRequest(BaseModel):
 
 class QueryResponse(BaseModel):
     question: str
+    status: str
     sql: str
     result: list
     error: str
@@ -153,6 +155,7 @@ def query_database(request: QueryRequest):
 
         return {
             "question": request.question,
+            "status": get_query_status(result),
             "sql": result.get("generated_sql", ""),
             "result": result.get("query_result", []),
             "error": error,
