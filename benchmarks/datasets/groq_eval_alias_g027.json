@@ -1,0 +1,14 @@
+{
+  "title": "Orka.ai focused Groq regression — G027",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Single-case regression for completed-order unit aggregation and the completed_units output alias.",
+  "cases": [
+    {
+      "id": "G027",
+      "category": "rag_grounding",
+      "question": "How many units were included in completed orders?",
+      "gold_sql": "SELECT SUM(oi.quantity) AS completed_units FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'Completed';"
+    }
+  ]
+}
