@@ -554,5 +554,82 @@ HAVING COUNT(o.order_id) >= 2
 ORDER BY c.customer_name;
 """,
         "description": "Find customers with at least two orders. Join customers to orders, return customer_name and the count of orders as order_count, use HAVING on COUNT(order_id), and sort by customer_name. Do not return customer_id instead of the customer name or count."
+    },
+
+    {
+        "id": "sql_example_orders_with_multiple_total_units",
+        "question": "Show orders containing more than one unit in total.",
+        "sql": """
+SELECT
+    o.order_id,
+    SUM(oi.quantity) AS total_units
+FROM orders AS o
+JOIN order_items AS oi
+    ON o.order_id = oi.order_id
+GROUP BY o.order_id
+HAVING SUM(oi.quantity) > 1
+ORDER BY o.order_id;
+""",
+        "description": "For each order, sum order_items.quantity, return order_id and total_units, and keep orders whose total quantity is greater than one. Do not return only the order ID."
+    },
+    {
+        "id": "sql_example_customers_without_cancelled_orders",
+        "question": "List customers who have never placed a cancelled order.",
+        "sql": """
+SELECT
+    c.customer_name
+FROM customers AS c
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM orders AS o
+    WHERE o.customer_id = c.customer_id
+      AND o.status = 'Cancelled'
+)
+ORDER BY c.customer_name;
+""",
+        "description": "Return customer_name, not customer_id, for customers with no related order whose status is Cancelled. Use a correlated NOT EXISTS subquery and sort names alphabetically."
+    },
+    {
+        "id": "sql_example_maximum_and_minimum_product_prices",
+        "question": "Find maximum and minimum product prices in one result.",
+        "sql": """
+SELECT
+    MAX(price) AS maximum_price,
+    MIN(price) AS minimum_price
+FROM products;
+""",
+        "description": "Return both scalar price aggregates in the requested order, using the exact aliases maximum_price and minimum_price."
+    },
+    {
+        "id": "sql_example_completed_orders_without_items",
+        "question": "Show completed orders that have no matching order items, if any.",
+        "sql": """
+SELECT
+    o.order_id
+FROM orders AS o
+LEFT JOIN order_items AS oi
+    ON o.order_id = oi.order_id
+WHERE o.status = 'Completed'
+  AND oi.order_id IS NULL
+ORDER BY o.order_id;
+""",
+        "description": "Find completed orders with no matching order_items row using LEFT JOIN and IS NULL. Return only order_id; do not include customer_id, order_date, or status."
+    },
+    {
+        "id": "sql_example_orders_with_earliest_order_date",
+        "question": "List orders with the earliest order date, including ties.",
+        "sql": """
+SELECT
+    order_id,
+    order_date
+FROM orders
+WHERE order_date = (
+    SELECT MIN(order_date)
+    FROM orders
+)
+ORDER BY order_id;
+""",
+        "description": "Return every order tied for the minimum order_date, including only order_id and order_date. Use a scalar MIN(order_date) subquery rather than LIMIT 1 so ties are preserved."
     }
+
 ]
