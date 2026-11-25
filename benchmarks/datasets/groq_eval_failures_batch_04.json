@@ -1,0 +1,38 @@
+{
+  "title": "Orka.ai focused Groq regression — G065 G067 G068 G074 G075",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Five-case regression batch covering completed revenue alias, per-category cheapest product projection, first order date per customer, revenue by status, and monthly order metrics.",
+  "cases": [
+    {
+      "id": "G065",
+      "category": "rag_grounding",
+      "question": "Calculate earnings from finished orders.",
+      "gold_sql": "SELECT SUM(oi.quantity * p.price) AS completed_revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE o.status = 'Completed';"
+    },
+    {
+      "id": "G067",
+      "category": "complex_analytics",
+      "question": "Show the cheapest product in each category with its price.",
+      "gold_sql": "SELECT product_name, category, price FROM (SELECT product_name, category, price, ROW_NUMBER() OVER (PARTITION BY category ORDER BY price, product_name) AS rn FROM products) ranked WHERE rn = 1 ORDER BY category;"
+    },
+    {
+      "id": "G068",
+      "category": "complex_analytics",
+      "question": "For each customer, show their first order date.",
+      "gold_sql": "SELECT c.customer_name, MIN(o.order_date) AS first_order_date FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.customer_name ORDER BY c.customer_name;"
+    },
+    {
+      "id": "G074",
+      "category": "complex_analytics",
+      "question": "Show revenue by order status.",
+      "gold_sql": "SELECT o.status, SUM(oi.quantity * p.price) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id GROUP BY o.status ORDER BY o.status;"
+    },
+    {
+      "id": "G075",
+      "category": "complex_analytics",
+      "question": "For each month, show order count and total units ordered.",
+      "gold_sql": "SELECT DATE_TRUNC('month', o.order_date) AS order_month, COUNT(DISTINCT o.order_id) AS order_count, SUM(oi.quantity) AS total_units FROM orders o JOIN order_items oi ON o.order_id = oi.order_id GROUP BY DATE_TRUNC('month', o.order_date) ORDER BY order_month;"
+    }
+  ]
+}
