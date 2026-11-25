@@ -101,7 +101,7 @@ ORDER BY c.customer_name;
     },
     {
         "id": "sql_example_revenue_by_category",
-        "question": "What is the total revenue for each product category?",
+        "question": "Which product category has the highest total revenue?",
         "sql": """
 SELECT
     p.category,
@@ -110,9 +110,10 @@ FROM order_items AS oi
 JOIN products AS p
     ON oi.product_id = p.product_id
 GROUP BY p.category
-ORDER BY revenue DESC;
+ORDER BY revenue DESC, p.category
+LIMIT 1;
 """,
-        "description": "Aggregate item quantity multiplied by product price for each product category."
+        "description": "Find the product category with the highest total revenue. Use revenue as the canonical output alias for SUM(quantity * product price), order by revenue descending with category as a deterministic tie-breaker, and return one category."
     },
     {
         "id": "sql_example_distinct_products_per_order",
