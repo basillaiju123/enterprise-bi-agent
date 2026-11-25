@@ -182,6 +182,9 @@ SQL GENERATION RULES:
 
 4. AGGREGATION AND FILTERS
 - Apply every condition stated in the question.
+- For questions asking for customers with a minimum number of orders, join customers to orders and return customer_name plus COUNT(order_id) AS order_count; use HAVING for the threshold rather than returning customer_id alone.
+- For filtered record lists, include all requested descriptive columns in the SELECT projection, not only the primary name or ID. Preserve their requested order.
+- For an inclusive date range on a DATE column, use order_date >= the start date and order_date < the day after the inclusive end date; return every date or descriptive field explicitly requested.
 - QUESTION SCOPE PRESERVATION:
   - Do not add status, date, country, category, or other filters unless explicitly requested or required by a documented business definition.
   - Do not assume that revenue, spending, or order-value questions refer only to completed orders.
