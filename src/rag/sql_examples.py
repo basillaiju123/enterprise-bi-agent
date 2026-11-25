@@ -233,6 +233,85 @@ WHERE status = 'Completed'
   AND order_date >= DATE '2025-06-10';
 """,
         "description": "Count orders with Completed status on or after June 10, 2025, using an inclusive date boundary and the exact output alias completed_orders."
+    },
+    {
+        "id": "sql_example_average_quantity_per_item_record",
+        "question": "What is the average quantity per order-item record?",
+        "sql": """
+SELECT AVG(quantity) AS average_quantity
+FROM order_items;
+""",
+        "description": "Calculate the arithmetic average of quantity across order_items records and use average_quantity as the exact output alias."
+    },
+    {
+        "id": "sql_example_completed_orders_and_revenue_by_country",
+        "question": "For each country, show the number of completed orders and completed revenue.",
+        "sql": """
+SELECT
+    c.country,
+    COUNT(DISTINCT o.order_id) AS completed_orders,
+    SUM(oi.quantity * p.price) AS completed_revenue
+FROM customers AS c
+JOIN orders AS o
+    ON c.customer_id = o.customer_id
+JOIN order_items AS oi
+    ON o.order_id = oi.order_id
+JOIN products AS p
+    ON oi.product_id = p.product_id
+WHERE o.status = 'Completed'
+GROUP BY c.country
+ORDER BY c.country;
+""",
+        "description": "For each customer country, count distinct completed orders and sum completed-order line revenue. Use the exact aliases completed_orders and completed_revenue, grouping and ordering by country."
+    },
+    {
+        "id": "sql_example_completed_orders_per_month_2025",
+        "question": "Calculate the number of completed orders per month in 2025.",
+        "sql": """
+SELECT
+    DATE_TRUNC('month', order_date) AS order_month,
+    COUNT(*) AS completed_orders
+FROM orders
+WHERE status = 'Completed'
+  AND order_date >= DATE '2025-01-01'
+  AND order_date < DATE '2026-01-01'
+GROUP BY DATE_TRUNC('month', order_date)
+ORDER BY order_month;
+""",
+        "description": "Count completed orders by calendar month during 2025. Use the half-open 2025 date range, output aliases order_month and completed_orders, and order chronologically by order_month."
+    },
+    {
+        "id": "sql_example_total_units_by_category",
+        "question": "Show the total quantity sold for each product category.",
+        "sql": """
+SELECT
+    p.category,
+    SUM(oi.quantity) AS total_units
+FROM order_items AS oi
+JOIN products AS p
+    ON oi.product_id = p.product_id
+GROUP BY p.category
+ORDER BY p.category;
+""",
+        "description": "Sum ordered item quantities by product category. Use total_units as the exact output alias and sort categories alphabetically."
+    },
+    {
+        "id": "sql_example_completed_order_value_by_order",
+        "question": "Calculate the total value of all completed orders for each order ID.",
+        "sql": """
+SELECT
+    o.order_id,
+    SUM(oi.quantity * p.price) AS order_value
+FROM orders AS o
+JOIN order_items AS oi
+    ON o.order_id = oi.order_id
+JOIN products AS p
+    ON oi.product_id = p.product_id
+WHERE o.status = 'Completed'
+GROUP BY o.order_id
+ORDER BY o.order_id;
+""",
+        "description": "Calculate each completed order's value by summing quantity multiplied by product price. Filter to Completed orders, use order_value as the output alias, and order by order_id."
     }
 
 ]
