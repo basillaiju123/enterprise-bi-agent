@@ -313,5 +313,81 @@ ORDER BY o.order_id;
 """,
         "description": "Calculate each completed order's value by summing quantity multiplied by product price. Filter to Completed orders, use order_value as the output alias, and order by order_id."
     }
+,
 
+    {
+        "id": "sql_example_top_three_customers_completed_orders",
+        "question": "Show the top three customers by number of completed orders.",
+        "sql": """
+SELECT
+    c.customer_name,
+    COUNT(*) AS completed_order_count
+FROM customers AS c
+JOIN orders AS o
+    ON c.customer_id = o.customer_id
+WHERE o.status = 'Completed'
+GROUP BY c.customer_id, c.customer_name
+ORDER BY completed_order_count DESC, c.customer_name
+LIMIT 3;
+""",
+        "description": "Return the three customers with the highest completed-order counts. Use completed_order_count as the metric alias and customer_name as a deterministic alphabetical tie-breaker after the count descending."
+    },
+    {
+        "id": "sql_example_orders_for_customer_id",
+        "question": "Show all orders placed by customer ID 2.",
+        "sql": """
+SELECT
+    order_id,
+    order_date,
+    status
+FROM orders
+WHERE customer_id = 2
+ORDER BY order_date, order_id;
+""",
+        "description": "List order IDs, dates, and statuses for customer ID 2. Treat customer_id only as a filter and do not include it in the output projection."
+    },
+    {
+        "id": "sql_example_item_record_count_per_order",
+        "question": "For each order, show its ID and number of item records.",
+        "sql": """
+SELECT
+    order_id,
+    COUNT(*) AS item_record_count
+FROM order_items
+GROUP BY order_id
+ORDER BY order_id;
+""",
+        "description": "Count order-item records per order, not the sum of quantities. Use item_record_count as the exact metric alias and order by order_id."
+    },
+    {
+        "id": "sql_example_successful_purchases_by_country",
+        "question": "Count successful purchases by customer country.",
+        "sql": """
+SELECT
+    c.country,
+    COUNT(DISTINCT o.order_id) AS successful_purchases
+FROM customers AS c
+JOIN orders AS o
+    ON c.customer_id = o.customer_id
+WHERE o.status = 'Completed'
+GROUP BY c.country
+ORDER BY c.country;
+""",
+        "description": "Count distinct orders with Completed status by customer country. In this benchmark, successful purchases means completed orders. Use successful_purchases as the exact alias and sort by country."
+    },
+    {
+        "id": "sql_example_units_sold_by_product_name",
+        "question": "Show total items sold by product name.",
+        "sql": """
+SELECT
+    p.product_name,
+    SUM(oi.quantity) AS units_sold
+FROM products AS p
+JOIN order_items AS oi
+    ON p.product_id = oi.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY p.product_name;
+""",
+        "description": "Sum item quantities for each product that appears in order_items. Use units_sold as the exact alias and sort product names alphabetically."
+    }
 ]
