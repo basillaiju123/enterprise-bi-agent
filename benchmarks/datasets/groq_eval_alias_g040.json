@@ -1,0 +1,14 @@
+{
+  "title": "Orka.ai focused Groq regression — G040",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Single-case regression for completed-order counting with an inclusive lower date bound and expected alias.",
+  "cases": [
+    {
+      "id": "G040",
+      "category": "complex_analytics",
+      "question": "Count completed orders placed on or after June 10, 2025.",
+      "gold_sql": "SELECT COUNT(*) AS completed_orders FROM orders WHERE status = 'Completed' AND order_date >= DATE '2025-06-10';"
+    }
+  ]
+}
