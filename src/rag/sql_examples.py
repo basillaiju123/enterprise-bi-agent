@@ -222,6 +222,17 @@ SELECT MAX(order_date) AS latest_order_date
 FROM orders;
 """,
         "description": "Return the latest order date using MAX(order_date) and the exact output alias latest_order_date."
+    },
+    {
+        "id": "sql_example_completed_orders_after_date_alias",
+        "question": "Count completed orders placed on or after June 10, 2025.",
+        "sql": """
+SELECT COUNT(*) AS completed_orders
+FROM orders
+WHERE status = 'Completed'
+  AND order_date >= DATE '2025-06-10';
+""",
+        "description": "Count orders with Completed status on or after June 10, 2025, using an inclusive date boundary and the exact output alias completed_orders."
     }
 
 ]
