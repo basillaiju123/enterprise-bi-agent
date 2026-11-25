@@ -32,6 +32,16 @@ LIMIT 1;
         "description": "Find the product with the highest price."
     },
     {
+        "id": "sql_example_completed_orders_count_alias",
+        "question": "Count all orders with Completed status.",
+        "sql": """
+SELECT COUNT(*) AS completed_orders
+FROM orders
+WHERE status = 'Completed';
+""",
+        "description": "Count all orders with Completed status and use completed_orders as the exact output alias."
+    },
+    {
         "id": "sql_example_completed_orders",
         "question": "How many orders were completed?",
         "sql": """
