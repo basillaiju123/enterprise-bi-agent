@@ -389,5 +389,93 @@ GROUP BY p.product_id, p.product_name
 ORDER BY p.product_name;
 """,
         "description": "Sum item quantities for each product that appears in order_items. Use units_sold as the exact alias and sort product names alphabetically."
+    },
+
+    {
+        "id": "sql_example_completed_revenue_finished_orders",
+        "question": "Calculate earnings from finished orders.",
+        "sql": """
+SELECT
+    SUM(oi.quantity * p.price) AS completed_revenue
+FROM orders AS o
+JOIN order_items AS oi
+    ON o.order_id = oi.order_id
+JOIN products AS p
+    ON oi.product_id = p.product_id
+WHERE o.status = 'Completed';
+""",
+        "description": "Calculate revenue from finished orders, where finished means status Completed. Use completed_revenue as the exact output alias."
+    },
+    {
+        "id": "sql_example_cheapest_product_per_category",
+        "question": "Show the cheapest product in each category with its price.",
+        "sql": """
+SELECT
+    product_name,
+    category,
+    price
+FROM (
+    SELECT
+        product_name,
+        category,
+        price,
+        ROW_NUMBER() OVER (
+            PARTITION BY category
+            ORDER BY price, product_name
+        ) AS rn
+    FROM products
+) AS ranked
+WHERE rn = 1
+ORDER BY category;
+""",
+        "description": "Return one cheapest product per category. Project columns in the order product_name, category, price; break equal-price ties by product_name and sort final rows by category."
+    },
+    {
+        "id": "sql_example_first_order_date_per_customer",
+        "question": "For each customer, show their first order date.",
+        "sql": """
+SELECT
+    c.customer_name,
+    MIN(o.order_date) AS first_order_date
+FROM customers AS c
+LEFT JOIN orders AS o
+    ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.customer_name
+ORDER BY c.customer_name;
+""",
+        "description": "Return every customer, including customers without orders, with their earliest order date. Use a LEFT JOIN from customers to orders, customer_name and first_order_date as output columns, and alphabetical customer ordering."
+    },
+    {
+        "id": "sql_example_revenue_by_order_status",
+        "question": "Show revenue by order status.",
+        "sql": """
+SELECT
+    o.status,
+    SUM(oi.quantity * p.price) AS revenue
+FROM orders AS o
+JOIN order_items AS oi
+    ON o.order_id = oi.order_id
+JOIN products AS p
+    ON oi.product_id = p.product_id
+GROUP BY o.status
+ORDER BY o.status;
+""",
+        "description": "Calculate revenue for each order status. Preserve the dimension column name status without renaming it to order_status, use revenue as the metric alias, and sort statuses alphabetically."
+    },
+    {
+        "id": "sql_example_monthly_order_count_and_units",
+        "question": "For each month, show order count and total units ordered.",
+        "sql": """
+SELECT
+    DATE_TRUNC('month', o.order_date) AS order_month,
+    COUNT(DISTINCT o.order_id) AS order_count,
+    SUM(oi.quantity) AS total_units
+FROM orders AS o
+JOIN order_items AS oi
+    ON o.order_id = oi.order_id
+GROUP BY DATE_TRUNC('month', o.order_date)
+ORDER BY order_month;
+""",
+        "description": "For each order month, return the month, distinct order count, and sum of item quantities. Use the exact aliases order_month, order_count, and total_units, in that output order, and sort chronologically."
     }
 ]
