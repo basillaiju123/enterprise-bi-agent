@@ -52,6 +52,16 @@ WHERE status = 'Completed';
         "description": "Count orders using the completed status."
     },
     {
+        "id": "sql_example_cancelled_orders_count_alias",
+        "question": "How many orders were cancelled?",
+        "sql": """
+SELECT COUNT(*) AS cancelled_orders
+FROM orders
+WHERE status = 'Cancelled';
+""",
+        "description": "Count orders with Cancelled status and use cancelled_orders as the exact output alias."
+    },
+    {
         "id": "sql_example_india_completed_orders",
         "question": "How many orders were completed by customers from India?",
         "sql": """
