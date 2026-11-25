@@ -1,0 +1,14 @@
+{
+  "title": "Orka.ai focused Groq regression — G097",
+  "version": 1,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Single-case regression for latest-date selection, exact output projection, and preservation of ties.",
+  "cases": [
+    {
+      "id": "G097",
+      "category": "edge_cases",
+      "question": "List orders with the latest order date, including ties.",
+      "gold_sql": "SELECT order_id, order_date FROM orders WHERE order_date = (SELECT MAX(order_date) FROM orders) ORDER BY order_id;"
+    }
+  ]
+}
