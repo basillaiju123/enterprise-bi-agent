@@ -1,0 +1,14 @@
+{
+  "title": "Orka.ai focused Groq regression — G012",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Single-case regression for the cancelled-order count output alias.",
+  "cases": [
+    {
+      "id": "G012",
+      "category": "sql_generation",
+      "question": "How many orders were cancelled?",
+      "gold_sql": "SELECT COUNT(*) AS cancelled_orders FROM orders WHERE status = 'Cancelled';"
+    }
+  ]
+}
