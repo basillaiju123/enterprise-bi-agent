@@ -631,5 +631,23 @@ ORDER BY order_id;
 """,
         "description": "Return every order tied for the minimum order_date, including only order_id and order_date. Use a scalar MIN(order_date) subquery rather than LIMIT 1 so ties are preserved."
     }
+,
+
+    {
+        "id": "sql_example_orders_with_latest_order_date",
+        "question": "List orders with the latest order date, including ties.",
+        "sql": """
+SELECT
+    order_id,
+    order_date
+FROM orders
+WHERE order_date = (
+    SELECT MAX(order_date)
+    FROM orders
+)
+ORDER BY order_id;
+""",
+        "description": "Return every order tied for the maximum order_date, including only order_id and order_date. Use a scalar MAX(order_date) subquery rather than LIMIT 1 so ties are preserved."
+    }
 
 ]
