@@ -1,0 +1,38 @@
+{
+  "title": "Orka.ai focused Groq regression — G041 G042 G046 G047 G049",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Five-case regression batch covering aggregate aliases, country-level completed metrics, monthly grouping, category totals, and completed order values.",
+  "cases": [
+    {
+      "id": "G041",
+      "category": "complex_analytics",
+      "question": "What is the average quantity per order-item record?",
+      "gold_sql": "SELECT AVG(quantity) AS average_quantity FROM order_items;"
+    },
+    {
+      "id": "G042",
+      "category": "complex_analytics",
+      "question": "For each country, show the number of completed orders and completed revenue.",
+      "gold_sql": "SELECT c.country, COUNT(DISTINCT o.order_id) AS completed_orders, SUM(oi.quantity * p.price) AS completed_revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE o.status = 'Completed' GROUP BY c.country ORDER BY c.country;"
+    },
+    {
+      "id": "G046",
+      "category": "multi_condition_sql",
+      "question": "Calculate the number of completed orders per month in 2025.",
+      "gold_sql": "SELECT DATE_TRUNC('month', order_date) AS order_month, COUNT(*) AS completed_orders FROM orders WHERE status = 'Completed' AND order_date >= DATE '2025-01-01' AND order_date < DATE '2026-01-01' GROUP BY DATE_TRUNC('month', order_date) ORDER BY order_month;"
+    },
+    {
+      "id": "G047",
+      "category": "multi_condition_sql",
+      "question": "Show the total quantity sold for each product category.",
+      "gold_sql": "SELECT p.category, SUM(oi.quantity) AS total_units FROM order_items oi JOIN products p ON oi.product_id = p.product_id GROUP BY p.category ORDER BY p.category;"
+    },
+    {
+      "id": "G049",
+      "category": "multi_condition_sql",
+      "question": "Calculate the total value of all completed orders for each order ID.",
+      "gold_sql": "SELECT o.order_id, SUM(oi.quantity * p.price) AS order_value FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE o.status = 'Completed' GROUP BY o.order_id ORDER BY o.order_id;"
+    }
+  ]
+}
