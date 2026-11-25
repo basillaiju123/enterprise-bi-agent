@@ -75,6 +75,19 @@ WHERE orders.status = 'Completed'
         "description": "Count completed orders for customers from a specific country."
     },
     {
+        "id": "sql_example_completed_orders_india_alias",
+        "question": "How many completed orders were placed by customers from India?",
+        "sql": """
+SELECT COUNT(DISTINCT o.order_id) AS completed_orders
+FROM orders AS o
+JOIN customers AS c
+    ON o.customer_id = c.customer_id
+WHERE o.status = 'Completed'
+  AND c.country = 'India';
+""",
+        "description": "Count distinct completed orders placed by Indian customers and use completed_orders as the exact output alias."
+    },
+    {
         "id": "sql_example_revenue",
         "question": "What is the revenue?",
         "sql": """
