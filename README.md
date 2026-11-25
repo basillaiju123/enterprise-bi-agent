@@ -59,6 +59,7 @@ LangGraph workflow
   |      +--> BM25 keyword retrieval
   |      +--> Reciprocal Rank Fusion (RRF)
   |      +--> Qdrant vector store
+  |      +--> Semantic relevance gate (reject unrelated questions)
   |
   +--> LLM SQL generation (Groq GPT-OSS-20B)
   |
@@ -97,6 +98,8 @@ Retrieves relevant schema details, business definitions, and SQL examples before
 The Docker build runs the RAG ingestion process so the image does not depend on locally generated Qdrant files.
 
 ### 3. Business Knowledge Grounding
+
+A configurable semantic relevance gate checks the maximum dense-retrieval similarity before either cached SQL or new SQL generation is used. The default cutoff is `0.302452`, calibrated against the current 11-query labeled robustness sample; it is a prototype heuristic, not a universal confidence score. Override it with the backend environment variable `RAG_MIN_SEMANTIC_SCORE` (a value from `0` to `1`). Irrelevant questions are returned without SQL generation. The relevance check also runs on semantic-cache hits.
 
 The knowledge base includes business definitions such as:
 
@@ -293,6 +296,7 @@ pip install -r requirements.txt
 
 ```dotenv
 GROQ_API_KEY=your_groq_api_key
+RAG_MIN_SEMANTIC_SCORE=0.302452
 LANGFUSE_PUBLIC_KEY=your_langfuse_public_key
 LANGFUSE_SECRET_KEY=your_langfuse_secret_key
 LANGFUSE_HOST=https://cloud.langfuse.com
