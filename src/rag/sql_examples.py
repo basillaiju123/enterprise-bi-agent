@@ -183,7 +183,7 @@ WHERE o.status = 'Completed';
 """,
         "description": "Sum item quantities only for orders whose status is Completed. Join orders to order_items by order_id and use completed_units as the exact output alias."
     },
-    ,{
+    {
         "id": "sql_example_units_ordered_per_product",
         "question": "How many units of each product have been ordered?",
         "sql": """
