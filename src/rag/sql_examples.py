@@ -169,9 +169,8 @@ GROUP BY oi.order_id
 ORDER BY oi.order_id;
 """,
         "description": "For this grouped analytics request, return one row per order with the count of unique product identifiers. Interpret this wording as a distinct-product count per order, not a listing of individual product IDs or names."
-    }
-
-    ,{
+    },
+    {
         "id": "sql_example_completed_units_alias",
         "question": "How many units were included in completed orders?",
         "sql": """
