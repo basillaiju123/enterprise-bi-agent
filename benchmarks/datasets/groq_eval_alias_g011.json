@@ -1,0 +1,14 @@
+{
+  "title": "Orka.ai focused Groq regression — G011",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Single-case regression for the completed-order count output alias.",
+  "cases": [
+    {
+      "id": "G011",
+      "category": "sql_generation",
+      "question": "Count all orders with Completed status.",
+      "gold_sql": "SELECT COUNT(*) AS completed_orders FROM orders WHERE status = 'Completed';"
+    }
+  ]
+}
