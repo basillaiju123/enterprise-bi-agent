@@ -117,6 +117,12 @@ def retrieve_knowledge(
             }
         )
 
+    max_semantic_score = max(semantic_scores.values(), default=0.0)
+
+    # Preserve the query-level maximum for the graph's relevance gate.
+    for item in candidates:
+        item["query_max_semantic_score"] = max_semantic_score
+
     candidates.sort(
         key=lambda item: item["score"],
         reverse=True,
