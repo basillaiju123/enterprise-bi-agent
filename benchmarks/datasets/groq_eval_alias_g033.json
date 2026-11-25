@@ -1,0 +1,14 @@
+{
+  "title": "Orka.ai focused Groq regression — G033",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Single-case regression for per-product unit totals, zero-order product inclusion, and deterministic alphabetical ordering.",
+  "cases": [
+    {
+      "id": "G033",
+      "category": "rag_grounding",
+      "question": "How many units of each product have been ordered?",
+      "gold_sql": "SELECT p.product_name, COALESCE(SUM(oi.quantity), 0) AS units_ordered FROM products p LEFT JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_id, p.product_name ORDER BY p.product_name;"
+    }
+  ]
+}
