@@ -20,3 +20,6 @@ class AgentState(TypedDict):
     cache_key: str
     evaluation_replay: bool
     replay_sql: str
+    retrieval_relevant: bool
+    retrieval_score: float
+    retrieval_error: str
