@@ -99,6 +99,15 @@ JOIN products
         "description": "Calculate revenue from order item quantities and product prices."
     },
     {
+        "id": "sql_example_units_sold_all_order_items",
+        "question": "How many units were purchased across all order items, regardless of order status?",
+        "sql": """
+SELECT SUM(quantity) AS units_sold
+FROM order_items;
+""",
+        "description": "Sum quantity across every order-item record without filtering by order status. Use units_sold as the exact output alias."
+    },
+    {
         "id": "sql_example_customer_completed_spend",
         "question": "Show the total completed-order spend for each customer.",
         "sql": """
