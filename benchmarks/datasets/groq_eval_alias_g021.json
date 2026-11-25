@@ -1,0 +1,14 @@
+{
+  "title": "Orka.ai focused Groq regression — G021",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Single-case regression for the India completed-order count alias.",
+  "cases": [
+    {
+      "id": "G021",
+      "category": "execution_correctness",
+      "question": "How many completed orders were placed by customers from India?",
+      "gold_sql": "SELECT COUNT(DISTINCT o.order_id) AS completed_orders FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.status = 'Completed' AND c.country = 'India';"
+    }
+  ]
+}
