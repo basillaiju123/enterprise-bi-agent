@@ -182,6 +182,21 @@ JOIN order_items AS oi
 WHERE o.status = 'Completed';
 """,
         "description": "Sum item quantities only for orders whose status is Completed. Join orders to order_items by order_id and use completed_units as the exact output alias."
+    },
+    ,{
+        "id": "sql_example_units_ordered_per_product",
+        "question": "How many units of each product have been ordered?",
+        "sql": """
+SELECT
+    p.product_name,
+    COALESCE(SUM(oi.quantity), 0) AS units_ordered
+FROM products AS p
+LEFT JOIN order_items AS oi
+    ON p.product_id = oi.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY p.product_name;
+""",
+        "description": "Return one row for every product, including products with no order items. Use a LEFT JOIN from products to order_items, COALESCE the summed quantity to zero, and use units_ordered as the output alias."
     }
 
 ]
