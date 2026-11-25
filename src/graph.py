@@ -69,17 +69,10 @@ builder.add_edge(
 # MISS → Normal RAG + LLM pipeline
 # =========================================================
 
-builder.add_conditional_edges(
+# Always check domain relevance before using generated or cached SQL.
+builder.add_edge(
     "cache_lookup",
-    lambda state: (
-        "hit"
-        if state["cache_hit"]
-        else "miss"
-    ),
-    {
-        "hit": "validate_sql",
-        "miss": "retrieve_knowledge",
-    },
+    "retrieve_knowledge",
 )
 
 
@@ -87,9 +80,22 @@ builder.add_conditional_edges(
 # RAG → LLM
 # =========================================================
 
-builder.add_edge(
+def route_after_retrieval(state: AgentState) -> str:
+    if not state.get("retrieval_relevant", False):
+        return "reject"
+    if state.get("cache_hit", False):
+        return "cached"
+    return "generate"
+
+
+builder.add_conditional_edges(
     "retrieve_knowledge",
-    "generate_sql",
+    route_after_retrieval,
+    {
+        "reject": END,
+        "cached": "validate_sql",
+        "generate": "generate_sql",
+    },
 )
 
 builder.add_edge(
