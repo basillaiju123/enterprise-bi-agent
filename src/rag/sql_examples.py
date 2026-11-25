@@ -477,5 +477,82 @@ GROUP BY DATE_TRUNC('month', o.order_date)
 ORDER BY order_month;
 """,
         "description": "For each order month, return the month, distinct order count, and sum of item quantities. Use the exact aliases order_month, order_count, and total_units, in that output order, and sort chronologically."
+    },
+
+    {
+        "id": "sql_example_completed_orders_inclusive_date_range",
+        "question": "Find completed orders placed between June 3 and June 12, 2025 inclusive.",
+        "sql": """
+SELECT
+    order_id,
+    order_date
+FROM orders
+WHERE status = 'Completed'
+  AND order_date >= DATE '2025-06-03'
+  AND order_date < DATE '2025-06-13'
+ORDER BY order_date, order_id;
+""",
+        "description": "Return both order_id and order_date for completed orders in the inclusive June 3 through June 12, 2025 date range. Use a half-open date interval ending June 13 and sort by order_date then order_id."
+    },
+    {
+        "id": "sql_example_indian_customers_signup_date",
+        "question": "List Indian customers who signed up after April 1, 2025.",
+        "sql": """
+SELECT
+    customer_name,
+    country,
+    signup_date
+FROM customers
+WHERE country = 'India'
+  AND signup_date > DATE '2025-04-01'
+ORDER BY customer_name;
+""",
+        "description": "List qualifying customer names together with country and signup_date. Keep the strict after-date condition and sort by customer_name."
+    },
+    {
+        "id": "sql_example_non_cancelled_orders_after_date",
+        "question": "Find non-cancelled orders placed after June 5, 2025.",
+        "sql": """
+SELECT
+    order_id,
+    order_date,
+    status
+FROM orders
+WHERE status <> 'Cancelled'
+  AND order_date > DATE '2025-06-05'
+ORDER BY order_date, order_id;
+""",
+        "description": "Return order_id, order_date, and status for orders not marked Cancelled and placed strictly after June 5, 2025. Preserve the status column and sort by order_date then order_id."
+    },
+    {
+        "id": "sql_example_electronics_audio_products_under_500",
+        "question": "Show Electronics or Audio products priced below 500.",
+        "sql": """
+SELECT
+    product_name,
+    category,
+    price
+FROM products
+WHERE category IN ('Electronics', 'Audio')
+  AND price < 500
+ORDER BY price, product_name;
+""",
+        "description": "Return product_name, category, and price in that order for Electronics and Audio products below 500. Sort by ascending price and then product_name."
+    },
+    {
+        "id": "sql_example_customers_with_at_least_two_orders",
+        "question": "Find customers with at least two orders.",
+        "sql": """
+SELECT
+    c.customer_name,
+    COUNT(o.order_id) AS order_count
+FROM customers AS c
+JOIN orders AS o
+    ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.customer_name
+HAVING COUNT(o.order_id) >= 2
+ORDER BY c.customer_name;
+""",
+        "description": "Find customers with at least two orders. Join customers to orders, return customer_name and the count of orders as order_count, use HAVING on COUNT(order_id), and sort by customer_name. Do not return customer_id instead of the customer name or count."
     }
 ]
