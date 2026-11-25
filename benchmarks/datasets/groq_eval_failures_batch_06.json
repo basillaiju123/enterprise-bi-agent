@@ -1,0 +1,38 @@
+{
+  "title": "Orka.ai focused Groq regression — G084 G085 G090 G093 G096",
+  "version": 1,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Five-case regression batch covering grouped quantity thresholds, anti-joins by customer name, paired aggregate aliases, empty related-row detection, and earliest-date ties.",
+  "cases": [
+    {
+      "id": "G084",
+      "category": "multi_condition_sql",
+      "question": "Show orders containing more than one unit in total.",
+      "gold_sql": "SELECT o.order_id, SUM(oi.quantity) AS total_units FROM orders AS o JOIN order_items AS oi ON o.order_id = oi.order_id GROUP BY o.order_id HAVING SUM(oi.quantity) > 1 ORDER BY o.order_id;"
+    },
+    {
+      "id": "G085",
+      "category": "multi_condition_sql",
+      "question": "List customers who have never placed a cancelled order.",
+      "gold_sql": "SELECT c.customer_name FROM customers AS c WHERE NOT EXISTS (SELECT 1 FROM orders AS o WHERE o.customer_id = c.customer_id AND o.status = 'Cancelled') ORDER BY c.customer_name;"
+    },
+    {
+      "id": "G090",
+      "category": "edge_cases",
+      "question": "Find maximum and minimum product prices in one result.",
+      "gold_sql": "SELECT MAX(price) AS maximum_price, MIN(price) AS minimum_price FROM products;"
+    },
+    {
+      "id": "G093",
+      "category": "edge_cases",
+      "question": "Show completed orders that have no matching order items, if any.",
+      "gold_sql": "SELECT o.order_id FROM orders AS o LEFT JOIN order_items AS oi ON o.order_id = oi.order_id WHERE o.status = 'Completed' AND oi.order_id IS NULL ORDER BY o.order_id;"
+    },
+    {
+      "id": "G096",
+      "category": "edge_cases",
+      "question": "List orders with the earliest order date, including ties.",
+      "gold_sql": "SELECT order_id, order_date FROM orders WHERE order_date = (SELECT MIN(order_date) FROM orders) ORDER BY order_id;"
+    }
+  ]
+}
