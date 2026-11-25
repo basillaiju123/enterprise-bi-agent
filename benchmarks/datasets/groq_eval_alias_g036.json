@@ -1,0 +1,14 @@
+{
+  "title": "Orka.ai focused Groq regression — G036",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Single-case regression for completed-order counts grouped by customer country, output alias, and alphabetical ordering.",
+  "cases": [
+    {
+      "id": "G036",
+      "category": "complex_analytics",
+      "question": "Show completed order counts for each customer country.",
+      "gold_sql": "SELECT c.country, COUNT(DISTINCT o.order_id) AS completed_orders FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE o.status = 'Completed' GROUP BY c.country ORDER BY c.country;"
+    }
+  ]
+}
