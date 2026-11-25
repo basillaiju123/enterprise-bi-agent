@@ -14,6 +14,7 @@ from src.validation_node import validate_sql_node
 from src.execution_node import execute_sql_node
 
 from src.router import route_after_execution
+from src.graph_routing import route_after_retrieval
 from src.correction_node import correction_node
 
 from src.evaluation_node import evaluate_sql_node
@@ -81,14 +82,6 @@ builder.add_edge(
 # =========================================================
 # RAG → LLM
 # =========================================================
-
-def route_after_retrieval(state: AgentState) -> str:
-    if not state.get("retrieval_relevant", False):
-        return "reject"
-    if state.get("cache_hit", False):
-        return "cached"
-    return "generate"
-
 
 builder.add_conditional_edges(
     "retrieve_knowledge",
