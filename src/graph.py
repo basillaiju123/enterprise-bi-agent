@@ -65,8 +65,10 @@ builder.add_edge(
 # =========================================================
 # Cache Lookup
 #
-# HIT  → Skip RAG + LLM
-# MISS → Normal RAG + LLM pipeline
+# Both cache hits and misses pass through the relevance gate.
+# Relevant cache hit  → Validate cached SQL
+# Relevant cache miss → Generate SQL
+# Irrelevant question → End without SQL generation
 # =========================================================
 
 # Always check domain relevance before using generated or cached SQL.
