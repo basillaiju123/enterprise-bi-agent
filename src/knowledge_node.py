@@ -26,6 +26,8 @@ def retrieve_knowledge_node(state: AgentState) -> AgentState:
         return {
             **state,
             "schema_context": "",
+            "generated_sql": "",
+            "query_result": [],
             "retrieval_relevant": False,
             "retrieval_score": relevance_score,
             "retrieval_error": (
