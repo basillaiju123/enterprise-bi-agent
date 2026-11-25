@@ -12,6 +12,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# When run as a script, Python puts benchmarks/ on sys.path, not the repo root.
+sys.path.insert(0, str(ROOT))
 DATASET_PATH = ROOT / "benchmarks" / "datasets" / "rag_retrieval_robustness.json"
 
 
