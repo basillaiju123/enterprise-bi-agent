@@ -213,6 +213,15 @@ GROUP BY c.country
 ORDER BY c.country;
 """,
         "description": "Count distinct completed orders for each customer country. Use completed_orders as the output alias and sort countries alphabetically."
+    },
+    {
+        "id": "sql_example_latest_order_date_alias",
+        "question": "What is the most recent order date?",
+        "sql": """
+SELECT MAX(order_date) AS latest_order_date
+FROM orders;
+""",
+        "description": "Return the latest order date using MAX(order_date) and the exact output alias latest_order_date."
     }
 
 ]
