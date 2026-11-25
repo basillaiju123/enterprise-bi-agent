@@ -110,6 +110,9 @@ def query_database(request: QueryRequest):
             "approval_status": "",
             "cache_hit": False,
             "cache_key": "",
+            "retrieval_relevant": False,
+            "retrieval_score": 0.0,
+            "retrieval_error": "",
         }
 
         # -------------------------------------------------
@@ -141,6 +144,7 @@ def query_database(request: QueryRequest):
             result.get("authorization_error", "")
             or result.get("execution_error", "")
             or result.get("validation_error", "")
+            or result.get("retrieval_error", "")
         )
 
         # -------------------------------------------------
