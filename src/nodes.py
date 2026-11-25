@@ -190,6 +190,7 @@ SQL GENERATION RULES:
   - Use COUNT(DISTINCT entity_id) when joins can multiply that entity.
   - Do not change the requested aggregation into a different metric.
   - Preserve the requested grouping dimensions and sort order when specified.
+- For top-N rankings, use the requested metric in descending order and add the requested entity's display name as a deterministic secondary sort key when ties are possible.
 - Group only by the requested dimensions.
 - Use COUNT(DISTINCT orders.order_id) when joins to order_items could multiply order rows.
 - Use categorical values and aliases documented in the retrieved knowledge, such as UK for United Kingdom.
