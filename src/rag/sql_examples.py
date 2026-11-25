@@ -171,4 +171,18 @@ ORDER BY oi.order_id;
         "description": "For this grouped analytics request, return one row per order with the count of unique product identifiers. Interpret this wording as a distinct-product count per order, not a listing of individual product IDs or names."
     }
 
+    ,{
+        "id": "sql_example_completed_units_alias",
+        "question": "How many units were included in completed orders?",
+        "sql": """
+SELECT
+    SUM(oi.quantity) AS completed_units
+FROM orders AS o
+JOIN order_items AS oi
+    ON o.order_id = oi.order_id
+WHERE o.status = 'Completed';
+""",
+        "description": "Sum item quantities only for orders whose status is Completed. Join orders to order_items by order_id and use completed_units as the exact output alias."
+    }
+
 ]
