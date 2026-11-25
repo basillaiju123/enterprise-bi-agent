@@ -197,6 +197,22 @@ GROUP BY p.product_id, p.product_name
 ORDER BY p.product_name;
 """,
         "description": "Return one row for every product, including products with no order items. Use a LEFT JOIN from products to order_items, COALESCE the summed quantity to zero, and use units_ordered as the output alias."
+    },
+    {
+        "id": "sql_example_completed_orders_by_country",
+        "question": "Show completed order counts for each customer country.",
+        "sql": """
+SELECT
+    c.country,
+    COUNT(DISTINCT o.order_id) AS completed_orders
+FROM customers AS c
+JOIN orders AS o
+    ON c.customer_id = o.customer_id
+WHERE o.status = 'Completed'
+GROUP BY c.country
+ORDER BY c.country;
+""",
+        "description": "Count distinct completed orders for each customer country. Use completed_orders as the output alias and sort countries alphabetically."
     }
 
 ]
