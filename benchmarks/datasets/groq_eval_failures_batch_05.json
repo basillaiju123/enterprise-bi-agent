@@ -1,0 +1,38 @@
+{
+  "title": "Orka.ai focused Groq regression — G079 G080 G081 G082 G083",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Five-case regression batch covering inclusive date filtering, descriptive projection, non-cancelled order attributes, product attributes and ordering, and customer names with grouped order counts.",
+  "cases": [
+    {
+      "id": "G079",
+      "category": "multi_condition_sql",
+      "question": "Find completed orders placed between June 3 and June 12, 2025 inclusive.",
+      "gold_sql": "SELECT order_id, order_date FROM orders WHERE status = 'Completed' AND order_date >= DATE '2025-06-03' AND order_date < DATE '2025-06-13' ORDER BY order_date, order_id;"
+    },
+    {
+      "id": "G080",
+      "category": "multi_condition_sql",
+      "question": "List Indian customers who signed up after April 1, 2025.",
+      "gold_sql": "SELECT customer_name, country, signup_date FROM customers WHERE country = 'India' AND signup_date > DATE '2025-04-01' ORDER BY customer_name;"
+    },
+    {
+      "id": "G081",
+      "category": "multi_condition_sql",
+      "question": "Find non-cancelled orders placed after June 5, 2025.",
+      "gold_sql": "SELECT order_id, order_date, status FROM orders WHERE status <> 'Cancelled' AND order_date > DATE '2025-06-05' ORDER BY order_date, order_id;"
+    },
+    {
+      "id": "G082",
+      "category": "multi_condition_sql",
+      "question": "Show Electronics or Audio products priced below 500.",
+      "gold_sql": "SELECT product_name, category, price FROM products WHERE category IN ('Electronics', 'Audio') AND price < 500 ORDER BY price, product_name;"
+    },
+    {
+      "id": "G083",
+      "category": "multi_condition_sql",
+      "question": "Find customers with at least two orders.",
+      "gold_sql": "SELECT c.customer_name, COUNT(o.order_id) AS order_count FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.customer_name HAVING COUNT(o.order_id) >= 2 ORDER BY c.customer_name;"
+    }
+  ]
+}
