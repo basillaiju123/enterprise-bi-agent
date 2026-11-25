@@ -1,0 +1,14 @@
+{
+  "title": "Orka.ai focused Groq regression — G026",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Single-case regression for the all-order-item units metric alias and status-scope preservation.",
+  "cases": [
+    {
+      "id": "G026",
+      "category": "rag_grounding",
+      "question": "How many units were purchased across all order items, regardless of order status?",
+      "gold_sql": "SELECT SUM(quantity) AS units_sold FROM order_items;"
+    }
+  ]
+}
