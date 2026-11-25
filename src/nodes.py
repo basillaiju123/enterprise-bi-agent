@@ -160,6 +160,8 @@ SQL GENERATION RULES:
 - Prefer the question's metric wording for aliases (for example, "average quantity" -> average_quantity, "latest order date" -> latest_order_date, and "maximum price" -> maximum_price).
 - For product-category revenue ranking questions such as "Which product category has the highest total revenue?", use the canonical metric alias revenue (not total_revenue), consistent with the category-revenue SQL example. If no clear phrase exists, create the shortest unambiguous descriptive alias. Never leave database-generated names such as count_star() or sum(...).
 - Do not rename ordinary dimension columns without a reason; a source column named status should normally remain status, not order_status.
+- When grouping by an ordinary dimension such as orders.status, keep the source column name unchanged unless the user explicitly requests a different label.
+- When the question requests multiple output fields, preserve their stated order in the SELECT projection; do not reorder dimensions for convenience.
 - When a customer name is requested, select customers.customer_name and join customers through customer_id.
 - When a product name is requested, select products.product_name and join products through product_id.
 - Never substitute an ID for a requested name.
