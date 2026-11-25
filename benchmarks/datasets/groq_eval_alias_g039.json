@@ -1,0 +1,14 @@
+{
+  "title": "Orka.ai focused Groq regression — G039",
+  "version": 2,
+  "database": "data/sample_warehouse.duckdb",
+  "note": "Single-case regression for latest order date aggregation and canonical output alias.",
+  "cases": [
+    {
+      "id": "G039",
+      "category": "complex_analytics",
+      "question": "What is the most recent order date?",
+      "gold_sql": "SELECT MAX(order_date) AS latest_order_date FROM orders;"
+    }
+  ]
+}
